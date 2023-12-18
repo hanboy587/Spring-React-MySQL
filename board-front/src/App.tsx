@@ -14,6 +14,8 @@ import User from 'views/User';
 import BoardDetail from 'views/Board/Detail';
 import BoardWrite from 'views/Board/Write';
 import BoardUpdate from 'views/Board/Update';
+import Container from 'layouts/Container';
+import { AUTH_PATH, BOARD_DETAIL_PATH, BOARD_PATH, BOARD_UPDATE_PATH, BOARD_WRITE_PATH, MAIN_PATH, SEARCH_PATH, USER_PATH } from 'constant';
 
 
 // component: Application 컴포넌트 //
@@ -57,15 +59,17 @@ return (
       {/* <Footer /> */}
 
       <Routes>
-        <Route path='/' element={<Main />} />
-        <Route path='/auth' element={<Authentication />} />
-        <Route path='/search' element={<Search />} />
-        <Route path='/user' element={<User />} />
-        <Route path='/board'>
-        <Route path='write' element={<BoardWrite />} />
-        <Route path='detail/:boardNumber' element={<BoardDetail />} />
-        <Route path='update/:boardNumber' element={<BoardUpdate />} />
-
+        <Route element={<Container />}>
+          <Route path={MAIN_PATH()} element={<Main />} />
+          <Route path={AUTH_PATH()} element={<Authentication />} />
+          <Route path={SEARCH_PATH(':searchWord')} element={<Search />} />
+          <Route path={USER_PATH(':userEmail')} element={<User />} />
+          <Route path={BOARD_PATH()}>
+            <Route path={BOARD_WRITE_PATH()} element={<BoardWrite />} />
+            <Route path={BOARD_DETAIL_PATH(':boardNumber')} element={<BoardDetail />} />
+            <Route path={BOARD_UPDATE_PATH(':boardNumber')} element={<BoardUpdate />} />
+          </Route>
+          <Route path='*' element={<h1>404 NOT FOUND</h1>} />
         </Route>
       </Routes>
     </>
