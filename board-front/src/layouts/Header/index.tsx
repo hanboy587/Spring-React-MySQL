@@ -1,10 +1,17 @@
 import React, { ChangeEvent, useRef, useState, KeyboardEvent, useEffect } from 'react'
 import './style.css';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MAIN_PATH, SEARCH_PATH } from 'constant';
+import { AUTH_PATH, MAIN_PATH, SEARCH_PATH, USER_PATH } from 'constant';
+import { useCookies } from 'react-cookie';
 
 // component: Header 레이아웃 //
 export default function Header() {
+
+  // state: cookie 상태 //
+  const [cookies, setCookie] = useCookies();
+
+  // state: 로그인 상태 //
+  const [isLogin, setLogin] = useState<boolean>(false);
 
 // function: nevigate 함수 //
 const navigator = useNavigate();
@@ -81,7 +88,28 @@ const SearchButton = () => {
     </div>  
   )
   
+  
+}
+// component: 로그인 마이페이지 버튼 컴포넌트 //
+const LoginMyPageButton = () => {
 
+  // event handler: 마이페이지 버튼 클릭 이벤트 처리 //
+  const onMyPageButtonClickHandler = () => {
+    navigator(USER_PATH(''));
+  };
+  
+  // event handler: 로그인 버튼 클릭 이벤트 처리 //
+  const onSignInButtonClickHandler = () => {
+    navigator(AUTH_PATH());
+  }
+
+  if (isLogin)
+  // render: 마이페이지 버튼 컴포넌트 렌더링 //
+  return <div className='white-button' onClick={onMyPageButtonClickHandler}>{'마이페이지'}</div>;
+  
+
+  // render: 로그인 버튼 컴포넌트 렌더링 //
+  return <div className='black-button' onClick={onSignInButtonClickHandler}>{'로그인'}</div>;
 }
 
 // render: Header 레이아웃 렌더링 //
@@ -96,6 +124,7 @@ const SearchButton = () => {
         </div>
         <div className='header-right-box'>
           <SearchButton />
+          <LoginMyPageButton />
         </div>
       </div>
     </div>
