@@ -29,7 +29,7 @@ public class SignUpResponseDto extends ResponseDto {
         ResponseDto result = new ResponseDto(ResponseCode.DUPLICATE_NICKNAME, ResponseMessage.DUPLICATE_NICKNAME);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
-    public static ResponseEntity<ResponseDto> duplicateTelNumber() {
+    public static ResponseEntity<ResponseDto> duplicateTellNumber() {
         ResponseDto result = new ResponseDto(ResponseCode.DUPLICATE_TEL_NUMBER, ResponseMessage.DUPLICATE_TEL_NUMBER);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
