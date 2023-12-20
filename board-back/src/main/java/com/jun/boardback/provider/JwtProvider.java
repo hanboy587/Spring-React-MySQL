@@ -17,8 +17,9 @@ public class JwtProvider {
     @Value("${secret-key}")
     private String secretKey;
 
+    // sign-in 요청 -> userEntity 및 findByEmail 성공 시 jwt 생성
     public String create(String eamil) {
-
+        // 1시간 후 만료
         Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
         
         String jwt = Jwts.builder()

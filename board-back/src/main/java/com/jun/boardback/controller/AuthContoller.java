@@ -2,7 +2,9 @@ package com.jun.boardback.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jun.boardback.dto.request.auth.SignInRequestDto;
 import com.jun.boardback.dto.request.auth.SignUpRequestDto;
+import com.jun.boardback.dto.response.auth.SignInResponseDto;
 import com.jun.boardback.dto.response.auth.SignUpResponseDto;
 import com.jun.boardback.service.AuthService;
 
@@ -23,6 +25,7 @@ public class AuthContoller {
 
     private final AuthService authService;
 
+    // 회원가입
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDto> signUp(@RequestBody @Valid SignUpRequestDto requestBody) {
 
@@ -30,5 +33,12 @@ public class AuthContoller {
 
         return response;
     }
+
+    // 로그인
+    @PostMapping("/sign-in")
+    public ResponseEntity<? super SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestBody) {
+        ResponseEntity<? super SignInResponseDto> response = authService.signIn(requestBody);
+        return response;
+    } 
     
 }
