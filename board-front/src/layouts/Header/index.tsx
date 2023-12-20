@@ -198,7 +198,7 @@ useEffect(() => {
       <div className='header-container'>
         <div className='header-left-box' onClick={onLogoClickHandler}>
           <div className='icon-box'>
-            <div className='icon logo-dark-icon'></div>
+            {/* <div className='icon logo-dark-icon'></div> */}
           </div>
           <div className='header-logo'>{'Juns Board'}</div>
         </div>
