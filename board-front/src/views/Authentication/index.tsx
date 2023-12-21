@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, useRef, ChangeEvent } from 'react'
+import React, { useState, KeyboardEvent, useRef, ChangeEvent, useEffect } from 'react'
 import './style.css'
 import InputBox from 'components/inputBox';
 import { SignInRequestDto, SignUpRequestDto } from 'apis/request/auth';
@@ -485,7 +485,13 @@ export default function Authentication() {
       setView('sign-in');
     }
 
-
+    useEffect(() => {
+      // onKeyDown 기능을 위한 useEffect
+      if (page === 2) {
+        if (!nicknameRef.current) return;
+        nicknameRef.current.focus();
+      }
+    },[page])
     
 
 
