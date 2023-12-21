@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { commentListMock, favoriteListMock, latestBoardListMock, top3BoardListMock } from 'mocks';
 import Top3Item from 'components/Top3Item';
@@ -10,19 +10,57 @@ import { Route, Routes } from 'react-router-dom';
 import Main from 'views/Main';
 import Authentication from 'views/Authentication';
 import Search from 'views/Search';
-import User from 'views/User';
+import UserV from 'views/User';
 import BoardDetail from 'views/Board/Detail';
 import BoardWrite from 'views/Board/Write';
 import BoardUpdate from 'views/Board/Update';
 import Container from 'layouts/Container';
 import { AUTH_PATH, BOARD_DETAIL_PATH, BOARD_PATH, BOARD_UPDATE_PATH, BOARD_WRITE_PATH, MAIN_PATH, SEARCH_PATH, USER_PATH } from 'constant';
 import BoardItem from 'components/BoardItem';
+import { useCookies } from 'react-cookie';
+import { useLoginuserStore } from 'stores';
+import { getSignInUserRequest } from 'apis';
+import { GetSignInUserResponseDto } from 'apis/response/user';
+import { ResponseDto } from 'apis/response';
+import { User } from 'types/interface';
 
 
 // component: Application 컴포넌트 //
 function App() {
+
+// state: login user 상태 //
+const { setLoginUser, resetLoginUser } = useLoginuserStore();
+
+// state: cookie 상태 //
+const [cookies, setCookie] = useCookies();
+
+// function: get sign in user response 처리 함수 //
+const getSignInUserResponse = (responseBody: GetSignInUserResponseDto | ResponseDto | null) => {
+  if (!responseBody) return;
+
+  const { code } = responseBody;
+
+  // 에러 상태일 때 reset
+  if (code === 'AF' || code === 'NU' || code == 'DBE') {
+    resetLoginUser();
+    return;
+  }
+
+  const loginUser: User = { ...(responseBody as GetSignInUserResponseDto) };
+  setLoginUser(loginUser);
+
+}
   
-  
+// effect: accessToken cookie 값 변경 될 때 마다 //
+useEffect(() => {
+  // 토큰이 없으면 reset 후 return
+  if(!cookies.accessToken){
+    resetLoginUser();
+    return;
+  }
+  getSignInUserRequest(cookies.accessToken).then(getSignInUserResponse)
+},[cookies.accessToken])
+
 // render: Application 컴포넌트 렌더링 //
 // description: 메인 : '/' -Main //
 // description: 로그인, 회원가입 : '/auth' - Authentication //
@@ -64,7 +102,7 @@ return (
           <Route path={MAIN_PATH()} element={<Main />} />
           <Route path={AUTH_PATH()} element={<Authentication />} />
           <Route path={SEARCH_PATH(':searchWord')} element={<Search />} />
-          <Route path={USER_PATH(':userEmail')} element={<User />} />
+          <Route path={USER_PATH(':userEmail')} element={<UserV />} />
           <Route path={BOARD_PATH()}>
             <Route path={BOARD_WRITE_PATH()} element={<BoardWrite />} />
             <Route path={BOARD_DETAIL_PATH(':boardNumber')} element={<BoardDetail />} />
