@@ -10,7 +10,7 @@ interface BoardStore {
     resetBoard: () => void;
 };
 
-const userBoardStore = create<BoardStore>(set => ({
+const useBoardStore = create<BoardStore>(set => ({
     title: '',
     content: '',
     boardImagesFileList: [],
@@ -20,4 +20,4 @@ const userBoardStore = create<BoardStore>(set => ({
     resetBoard: () => set(state => ({ ...state, title: '', content: '', boardImagesFileList: [] })),
 }));
 
-export default userBoardStore;
+export default useBoardStore;
