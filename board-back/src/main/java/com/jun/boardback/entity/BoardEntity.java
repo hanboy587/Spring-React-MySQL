@@ -1,10 +1,16 @@
 package com.jun.boardback.entity;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +34,20 @@ public class BoardEntity {
     private int viewCount;
     private String writerEmail;
 
+
+    // BoardServiceImpl board 생성 생성자
+    public BoardEntity(PostBoardRequestDto dto, String email) {
+
+        Date now = Date.from(Instant.now());
+        SimpleDateFormat simplkDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String writeDateTime = simplkDateFormat.format(now);
+
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.writeDatetime = writeDateTime;
+        this.favoriteCount = 0;
+        this.commentCount = 0;
+        this.viewCount = 0;
+        this.writerEmail = email;
+    }   
 }
