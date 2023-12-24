@@ -1,7 +1,11 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import './style.css'
-import { userBoardStore } from 'stores';
 import useBoardStore from 'stores/board.store';
+import { useLoginuserStore } from 'stores';
+import { log } from 'console';
+import { useNavigate } from 'react-router-dom';
+import { MAIN_PATH } from 'constant';
+import { useCookies } from 'react-cookie';
 
 // component: 게시물 작성 컴포넌트 //
 export default function BoardWrite() {
@@ -18,8 +22,17 @@ export default function BoardWrite() {
   // state: board 상태 //
   const { title, setTitle, content, setContent, boardImagesFileList, setBoardImageFileList, resetBoard } = useBoardStore();
 
+  // state: login user 상태 //
+  const { loginUser } = useLoginuserStore();
+
+  // state: cookie 상태 //
+  const [cookies, setCookie] = useCookies();
+
   // state: board image 미리보기 url 상태 //
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  // function: navigate //
+  const navigater = useNavigate();
 
   // event handler: title 변경 처리 //
   const onTitleChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -87,6 +100,12 @@ export default function BoardWrite() {
 
   // effect: 마운트 할 때마다 실행 //
   useEffect(() => {
+    // 쿠키에 token이 없으면 메인 화면으로 //
+    const accessToken = cookies.accessToken;
+    if (!accessToken) {
+      navigater(MAIN_PATH());
+      return;
+    }
     resetBoard();
   },[])
 

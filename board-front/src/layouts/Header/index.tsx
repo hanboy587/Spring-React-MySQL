@@ -5,6 +5,10 @@ import { AUTH_PATH, BOARD_DETAIL_PATH, BOARD_PATH, BOARD_UPDATE_PATH, BOARD_WRIT
 import { useCookies } from 'react-cookie';
 import { useLoginuserStore, userBoardStore } from 'stores';
 import path from 'path';
+import { fileUploadReqeust, postBoardRequest } from 'apis';
+import { PostBoardRequestDto } from 'apis/request/board';
+import { PostBoardResponseDto } from 'apis/response/board';
+import { ResponseDto } from 'apis/response';
 
 // component: Header 레이아웃 //
 export default function Header() {
@@ -161,9 +165,45 @@ const UploadButton = () => {
   // state: 게시물 상태 //
   const { title, content, boardImagesFileList, resetBoard } = userBoardStore();
 
-  // event handler: 업로드 버튼 클릭 이벤트 //
-  const onUploadButtonClickHandler = () => {
+  // function: post board response //
+  const postBoardResponse = (responseBody: PostBoardResponseDto | ResponseDto | null) => {
+    if (!responseBody) return;
+    const { code } = responseBody;
 
+    if (code === 'AF' || code === 'NU') navigator(AUTH_PATH());
+    if (code === 'VF') alert('제목과 내용은 필수입니다.');
+    if (code === 'DBE') alert('데이터베이스 오류입니다.');
+    if (code !== 'SU') return;
+    
+    // 작성 완료 후 초기화 //
+    resetBoard();
+    if (!loginUser) return;
+    // 로그인 정보가 있으면 작성 후 마이페이지로 이동 //
+    const { email } = loginUser;
+    navigator(USER_PATH(email));
+  }
+
+  // event handler: 업로드 버튼 클릭 이벤트 //
+  const onUploadButtonClickHandler = async () => {
+    // 토큰 확인 //
+    const accessToken = cookies.accessToken;
+    if (!accessToken) return;
+    
+    const boardImageList: string[] = [];
+
+    for (const file of boardImagesFileList) {
+      const data = new FormData();
+      data.append('file', file);
+
+      const url = await fileUploadReqeust(data);
+      if (url) boardImageList.push(url);
+    }
+
+    const requestBody: PostBoardRequestDto = {
+      title, content, boardImageList
+    }
+
+    postBoardRequest(requestBody, accessToken).then(postBoardResponse);
   }
 
 
