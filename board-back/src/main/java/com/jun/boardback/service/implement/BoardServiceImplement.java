@@ -8,14 +8,17 @@ import org.springframework.stereotype.Service;
 
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 import com.jun.boardback.dto.response.ResponseDto;
+import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
 import com.jun.boardback.entity.BoardEntity;
 import com.jun.boardback.entity.ImageEntity;
 import com.jun.boardback.repository.BoardRepository;
 import com.jun.boardback.repository.ImageRepository;
 import com.jun.boardback.repository.UserRepository;
+import com.jun.boardback.repository.resultSet.GetBoardResultSet;
 import com.jun.boardback.service.BoardService;
 
+import javafx.scene.image.Image;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,6 +28,35 @@ public class BoardServiceImplement implements BoardService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final ImageRepository imageRepository;
+
+    @Override
+    public ResponseEntity<? super GetBoardResponseDto> getBoard(Integer boardNumber) {
+
+        GetBoardResultSet resultSet = null;
+        List<ImageEntity> imageEntities = new ArrayList<>();
+
+        try {
+
+            resultSet = boardRepository.getBoard(boardNumber);
+            if (resultSet == null) return GetBoardResponseDto.noExistBoard();
+
+            imageEntities = imageRepository.findByBoardNumber(boardNumber);
+
+            BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
+            boardEntity.increasViewCount();
+            boardRepository.save(boardEntity);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return GetBoardResponseDto.success(resultSet, imageEntities);
+    }
+    
+
+
     
     // 게시물 등록
     @Override
@@ -59,5 +91,6 @@ public class BoardServiceImplement implements BoardService {
 
         return PostBoardResponseDto.success();
     }
+
     
 }
