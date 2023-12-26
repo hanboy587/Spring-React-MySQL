@@ -11,6 +11,9 @@ import com.jun.boardback.dto.object.FavoriteListItem;
 import com.jun.boardback.dto.response.ResponseDto;
 import com.jun.boardback.repository.resultSet.GetFavoriteListResultSet;
 
+import lombok.Getter;
+
+@Getter
 public class GetFavoriteListReponseDto extends ResponseDto {
     
     private List<FavoriteListItem> favoriteList;
@@ -20,9 +23,9 @@ public class GetFavoriteListReponseDto extends ResponseDto {
         this.favoriteList = FavoriteListItem.copyList(resultSets);
     }
 
-    private GetFavoriteListReponseDto() {
-        super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-    }
+    // private GetFavoriteListReponseDto() {
+    //     super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+    // }
 
     public static ResponseEntity<GetFavoriteListReponseDto> success(List<GetFavoriteListResultSet> resultSets) {
         GetFavoriteListReponseDto result = new GetFavoriteListReponseDto(resultSets);

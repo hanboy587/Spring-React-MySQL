@@ -133,7 +133,7 @@ public class BoardServiceImplement implements BoardService {
 
 
 
-
+    // 좋아요 리스트
     @Override
     public ResponseEntity<? super GetFavoriteListReponseDto> getFavoriteList(Integer boardNumber) {
 
