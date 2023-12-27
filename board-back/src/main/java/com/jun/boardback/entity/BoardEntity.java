@@ -56,11 +56,18 @@ public class BoardEntity {
         this.viewCount++;
     }
 
+    // 좋아요 1 증가
     public void increaseFavoriteCount() {
         this.favoriteCount++;
     }
 
+    // 좋아요 1 감소
     public void decreaseFavoritCount() {
         this.favoriteCount--;
+    }
+
+    // 댓글 1 증가
+    public void increaseCommentCount() {
+        this.commentCount++;
     }
 }

@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
+import com.jun.boardback.dto.request.auth.board.PostCommentRequestDto;
 import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
+import com.jun.boardback.dto.response.board.PostCommentResponseDto;
 import com.jun.boardback.dto.response.board.PutFavoriteResponseDto;
 import com.jun.boardback.service.BoardService;
 
@@ -54,6 +56,16 @@ public class BoardController {
     @GetMapping("/{boardNumber}/favorite-list")
     public ResponseEntity<? super GetFavoriteListReponseDto> getFavoriteList(@PathVariable("boardNumber") Integer boardNumber) {
         ResponseEntity<? super GetFavoriteListReponseDto> response = boardService.getFavoriteList(boardNumber);
+        return response;
+    }
+
+    @PostMapping("/{boardNumber}/comment")
+    public ResponseEntity<? super PostCommentResponseDto> postComment(
+        @RequestBody @Valid PostCommentRequestDto requestBody,
+        @PathVariable("boardNumber") Integer baordNumber,
+        @AuthenticationPrincipal String email
+    ) {
+        ResponseEntity<? super PostCommentResponseDto> response = boardService.postComment(requestBody, email, baordNumber);
         return response;
     }
 }
