@@ -10,6 +10,7 @@ import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostCommentRequestDto;
 import com.jun.boardback.dto.response.ResponseDto;
 import com.jun.boardback.dto.response.board.GetBoardResponseDto;
+import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostCommentResponseDto;
@@ -24,6 +25,7 @@ import com.jun.boardback.repository.FavoriteRepository;
 import com.jun.boardback.repository.ImageRepository;
 import com.jun.boardback.repository.UserRepository;
 import com.jun.boardback.repository.resultSet.GetBoardResultSet;
+import com.jun.boardback.repository.resultSet.GetCommentListResultSet;
 import com.jun.boardback.repository.resultSet.GetFavoriteListResultSet;
 import com.jun.boardback.service.BoardService;
 
@@ -185,6 +187,30 @@ public class BoardServiceImplement implements BoardService {
         }
         
         return PostCommentResponseDto.success();
+    }
+
+
+
+
+    @Override
+    public ResponseEntity<? super GetCommentListResponseDto> getCommentList(Integer boardNumber) {
+
+        List<GetCommentListResultSet> resultSets = new ArrayList<>();
+
+        try {
+
+            boolean existedBoard = boardRepository.existsByBoardNumber(boardNumber);
+            if (!existedBoard) return GetCommentListResponseDto.noExistBoard();
+
+            resultSets = commentRepository.getCommentList(boardNumber);
+        
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return GetCommentListResponseDto.success(resultSets);
+
     }
 
     
