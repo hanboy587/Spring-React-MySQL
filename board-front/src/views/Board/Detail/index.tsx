@@ -43,7 +43,7 @@ export default function BoardDetail() {
                 <div className='board-detail-delete-button'>{'삭제'}</div>
               </div>
             }
-          </div>
+          </div> 
         </div>
         <div className='divider'></div>
         <div className='board-detail-top-main'>
@@ -73,7 +73,7 @@ export default function BoardDetail() {
             <div className='icon-button'>
               <div className='icon favorite-fill-icon'></div>
             </div>
-            <div className='board-detail-bottom-button-text'>`{'좋아요 ${12}'}`</div>
+            <div className='board-detail-bottom-button-text'>{`좋아요 ${12}`}</div>
             <div className='icon-button'>
               <div className='icon up-light-icon'></div>
             </div>
@@ -82,7 +82,7 @@ export default function BoardDetail() {
             <div className='icon-button'>
               <div className='icon comment-icon'></div>
             </div>
-            <div className='board-detail-bottom-button-text'>`{'댓글 ${12}'}`</div>
+            <div className='board-detail-bottom-button-text'>{`댓글 ${12}`}</div>
             <div className='icon-button'>
               <div className='icon up-light-icon'></div>
             </div>

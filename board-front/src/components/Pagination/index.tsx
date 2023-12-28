@@ -6,6 +6,6 @@ export default function pagination() {
 
 // render: pagination 컴포넌트 렌더링 //
   return (
-    <div>index</div>
+    <div></div>
   )
 }

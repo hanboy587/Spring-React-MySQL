@@ -177,6 +177,27 @@
     background-image: url(assets/image/more.png);
 }
 
+.favorite-fill-icon {
+    background-image: url(assets/image/favorite-fill.png);
+}
+
+.favorite-light-icon {
+    background-image: url(assets/image/favorite-light.png);
+}
+
+.up-light-icon {
+    background-image: url(assets/image/expand-right-light.png);
+}
+
+.down-light-icon {
+    background-image: url(assets/image/expand-left.png);
+}
+
+.comment-icon {
+    background-image: url(assets/image/chat-light.png);
+}
+
+
 .auth-description-box {
     display: flex;
     justify-content: center;
