@@ -5,6 +5,7 @@ import { commentListMock, favoriteListMock } from 'mocks'
 import FavoriteItem from 'components/favoriteItem'
 import CommentItem from 'components/commentItem'
 import Pagination from 'components/Pagination'
+import defaultProfileImage from 'assets/image/default-profile-image.png';
 
 // component: 게시물 상세 컴포넌트 //
 export default function BoardDetail() {
@@ -12,30 +13,42 @@ export default function BoardDetail() {
   // component: board detail 상단 컴포넌트 //
   const BoardDetailTop = () => {
 
+    // state: more button //
+    const [showMore, setShowMore] = useState<boolean>(false);
+
+    // event handler: more buuton click 이벤트 처리 //
+    const onMoreButtonClickHandler = () => {
+      setShowMore(!showMore);
+    }
+
     // render: board detail 상단 렌더링 //
     return (
       <div id='board-detail-top'>
         <div className='board-detail-top-header'>
           <div className='board-detail-title'>{'오늘의 첫 글 인사드려요. 반갑습니다.'}</div>
           <div className='board-detail-top-sub-box'>
-            <div className='board-detail-writer-profile-image'></div>
-            <div className='board-detail-writer-nickname'>{'닉네임 예시'}</div>
-            <div className='board-detail-info-divider'>{'\|'}</div>
-            <div className='board-detail-write-date'>{'2023. 11. 13.'}</div>
-          </div>
-          <div className='icon-button'>
-            <div className='icon more-icon'></div>
-          </div>
-          <div className='board-detail-more-box'>
-            <div className='board-detail-update-button'>{'수정'}</div>
-            <div className='divider'></div>
-            <div className='board-detail-delete-button'>{'삭제'}</div>
+            <div className='board-detail-write-info-box'>
+              <div className='board-detail-writer-profile-image' style={{ backgroundImage: `url(${defaultProfileImage})` }}></div>
+              <div className='board-detail-writer-nickname'>{'닉네임 예시'}</div>
+              <div className='board-detail-info-divider'>{'\|'}</div>
+              <div className='board-detail-write-date'>{'2023. 11. 13.'}</div>
+            </div>
+            <div className='icon-button' onClick={onMoreButtonClickHandler}>
+              <div className='icon more-icon'></div>
+            </div>
+            {showMore &&
+              <div className='board-detail-more-box'>
+                <div className='board-detail-update-button'>{'수정'}</div>
+                <div className='divider'></div>
+                <div className='board-detail-delete-button'>{'삭제'}</div>
+              </div>
+            }
           </div>
         </div>
         <div className='divider'></div>
         <div className='board-detail-top-main'>
           <div className='board-detail-main-text'>{'오늘 첫 글이에요 반가워요 만나서 반가워요 코딩은 재밌습니다'}</div>
-          <div className='board-detail-main-image'></div>
+          <img className='board-detail-main-image' src='https://product.cdn.cevaws.com/var/storage/images/_aliases/reference/media/feliway-2017/images/kor-kr/1_gnetb-7sfmbx49emluey4a/6341829-1-kor-KR/1_gNETb-7SfMBX49EMLUeY4A.jpg' />
         </div>
       </div>
     )
@@ -109,7 +122,7 @@ export default function BoardDetail() {
 
   // render: 게시물 상세 컴포넌트 렌더링 //
   return (
-    <div id='board-detail=wrapper'>
+    <div id='board-detail-wrapper'>
       <div className='board-detail-container'>
         <BoardDetailTop />
         <BoardDetailBottom />

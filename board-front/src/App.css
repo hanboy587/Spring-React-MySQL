@@ -173,6 +173,10 @@
     background-image: url(assets/image/close.png);
 }
 
+.more-icon {
+    background-image: url(assets/image/more.png);
+}
+
 .auth-description-box {
     display: flex;
     justify-content: center;
