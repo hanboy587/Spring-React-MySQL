@@ -1,54 +1,97 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import './style.css'
-import { CommentListItem, FavoriteListItem } from 'types/interface'
-import { commentListMock, favoriteListMock } from 'mocks'
+import { Board, CommentListItem, FavoriteListItem } from 'types/interface'
+import { boardMock, commentListMock, favoriteListMock } from 'mocks'
 import FavoriteItem from 'components/favoriteItem'
 import CommentItem from 'components/commentItem'
 import Pagination from 'components/Pagination'
 import defaultProfileImage from 'assets/image/default-profile-image.png';
+import { useLoginuserStore } from 'stores'
+import { useNavigate, useParams } from 'react-router-dom'
+import { BOARD_PATH, BOARD_UPDATE_PATH, MAIN_PATH, USER_PATH } from 'constant'
 
 // component: 게시물 상세 컴포넌트 //
 export default function BoardDetail() {
 
+  // state: 게시물 번호 path variable 상태 //
+  const { boardNumber } = useParams();
+
+  // state: login user 상태 //
+  const { loginUser } = useLoginuserStore();
+
+  // function: navivator //
+  const navigator = useNavigate();
+
   // component: board detail 상단 컴포넌트 //
   const BoardDetailTop = () => {
+
+    // state: board 상태 //
+    const [board, setBoard] = useState<Board | null>(null);
 
     // state: more button //
     const [showMore, setShowMore] = useState<boolean>(false);
 
     // event handler: more buuton click 이벤트 처리 //
+    const onNicknameClickHandler = () => {
+      if (!board) return;
+      navigator(USER_PATH(board.writerEmail));
+    }
+    
+    // event handler: nickname click 이벤트 처리 //
     const onMoreButtonClickHandler = () => {
       setShowMore(!showMore);
     }
+    
+    // event handler: update button click 이벤트 처리 //
+    const onUpdateButtonClickHandler = () => {
+      // if (!board) return;
+      if (!board || !loginUser) return;
+      if (loginUser.email !== board.writerEmail) return;
+      navigator(BOARD_PATH() + '/' + BOARD_UPDATE_PATH(board.boardNumber));
+    }
+    
+    // event handler: delete button click 이벤트 처리 //
+    const onDeleteButtonClickHandler = () => {
+      if (!board || !loginUser) return;
+      if (loginUser.email !== board.writerEmail) return;
+      navigator(MAIN_PATH());
+    }
 
+    // effect: 게시물 번호 path variable 바뀔 때 마다 //
+    useEffect(() => {
+      setBoard(boardMock);
+    }, [boardNumber])
+
+    
     // render: board detail 상단 렌더링 //
+    if (!board) return <></>
     return (
       <div id='board-detail-top'>
         <div className='board-detail-top-header'>
-          <div className='board-detail-title'>{'오늘의 첫 글 인사드려요. 반갑습니다.'}</div>
+          <div className='board-detail-title'>{board.title}</div>
           <div className='board-detail-top-sub-box'>
             <div className='board-detail-write-info-box'>
-              <div className='board-detail-writer-profile-image' style={{ backgroundImage: `url(${defaultProfileImage})` }}></div>
-              <div className='board-detail-writer-nickname'>{'닉네임 예시'}</div>
+              <div className='board-detail-writer-profile-image' style={{ backgroundImage: `url(${board?.writerProfileImage ? board.writerProfileImage : defaultProfileImage})` }}></div>
+              <div className='board-detail-writer-nickname' onClick={onNicknameClickHandler}>{board.writerNickname}</div>
               <div className='board-detail-info-divider'>{'\|'}</div>
-              <div className='board-detail-write-date'>{'2023. 11. 13.'}</div>
+              <div className='board-detail-write-date'>{board.writeDateTime}</div>
             </div>
             <div className='icon-button' onClick={onMoreButtonClickHandler}>
               <div className='icon more-icon'></div>
             </div>
             {showMore &&
               <div className='board-detail-more-box'>
-                <div className='board-detail-update-button'>{'수정'}</div>
+                <div className='board-detail-update-button' onClick={onUpdateButtonClickHandler}>{'수정'}</div>
                 <div className='divider'></div>
-                <div className='board-detail-delete-button'>{'삭제'}</div>
+                <div className='board-detail-delete-button' onClick={onDeleteButtonClickHandler}>{'삭제'}</div>
               </div>
             }
           </div> 
         </div>
         <div className='divider'></div>
         <div className='board-detail-top-main'>
-          <div className='board-detail-main-text'>{'오늘 첫 글이에요 반가워요 만나서 반가워요 코딩은 재밌습니다'}</div>
-          <img className='board-detail-main-image' src='https://product.cdn.cevaws.com/var/storage/images/_aliases/reference/media/feliway-2017/images/kor-kr/1_gnetb-7sfmbx49emluey4a/6341829-1-kor-KR/1_gNETb-7SfMBX49EMLUeY4A.jpg' />
+          <div className='board-detail-main-text'>{board.content}</div>
+          {board.boardImageList.map(image => <img className='board-detail-main-image' src={image} />)}
         </div>
       </div>
     )
@@ -57,48 +100,112 @@ export default function BoardDetail() {
   // component: board detail 하단 컴포넌트 //
   const BoardDetailBottom = () => {
 
-    const [favoriteList, setFavoriteList] = useState<FavoriteListItem[]>([]);
-    const [commentList, setCommentList] = useState<CommentListItem[]>([]);
+    // state: comment textarea 참조 상태 //
+    const commentRef = useRef<HTMLTextAreaElement | null>(null);
 
+    // state: favorite list 상태 //
+    const [favoriteList, setFavoriteList] = useState<FavoriteListItem[]>([]);
+    // state: comment list 상태 //
+    const [commentList, setCommentList] = useState<CommentListItem[]>([]);
+    // state: 좋아요 상태 //
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
+    // state: show favorite 상태 //
+    const [showFavorite, setShowFavorite] = useState<boolean>(true);
+    // state: show comment 상태 //
+    const [showComment, setShowComment] = useState<boolean>(true);
+    // state: comment 상태 //
+    const [comment, setComment] = useState<string>('');
+
+    // event handler: favorite click 이벤트 처리 //
+    const onFavoriteClickHandler = () => {
+      setIsFavorite(!isFavorite);
+    }
+
+    // event handler: show favorite click 이벤트 처리 //
+    const onShowFavoriteClickHandler = () => {
+      setShowFavorite(!showFavorite);
+    }
+
+    // event handler: show comment click 이벤트 처리 //
+    const onShowCommentClickHandler = () => {
+      setShowComment(!showComment);
+    }
+
+    // event handler: comment 작성 click 이벤트 처리 //
+    const onCommentSubmitButtonClickHandler = () => {
+      // 버튼이 disable로 보이지만 클릭은 되므로 방지 //
+      if (!comment) return;
+      alert('!!');
+    }
+
+    // event handler: comment change 이벤트 처리 //
+    const onCommentChangeHandler = (event: ChangeEvent<HTMLTextAreaElement>) => {
+      const { value } = event.target;
+      setComment(value);
+
+      if (!commentRef.current) return;
+      commentRef.current.style.height = 'auto';
+      commentRef.current.style.height = `${commentRef.current.scrollHeight}px`;
+    }
+
+    // effect: 게시물 번호 path variable 바뀔 때 마다 //
     useEffect(() => {
       setFavoriteList(favoriteListMock);
       setCommentList(commentListMock);
-    },[])
+    },[boardNumber])
     
     // render: board detail 하단 렌더링 //
     return (
       <div id='board-detail-bottom'>
         <div className='board-detail-bottom-button-box'>
           <div className='board-detail-bottom-button-group'>
-            <div className='icon-button'>
-              <div className='icon favorite-fill-icon'></div>
+            <div className='icon-button'  onClick={onFavoriteClickHandler}>
+              {isFavorite ?
+                <div className='icon favorite-fill-icon'></div>
+                :
+                <div className='icon favorite-light-icon'></div>
+              }
             </div>
-            <div className='board-detail-bottom-button-text'>{`좋아요 ${12}`}</div>
-            <div className='icon-button'>
-              <div className='icon up-light-icon'></div>
+            <div className='board-detail-bottom-button-text'>{`좋아요 ${favoriteList.length}`}</div>
+            <div className='icon-button' onClick={onShowFavoriteClickHandler}>
+              {showFavorite ?
+                <div className='icon up-light-icon'></div>
+                :
+                <div className='icon down-light-icon'></div>
+              
+              }
             </div>
           </div>
           <div className='board-detail-bottom-button-group'>
             <div className='icon-button'>
               <div className='icon comment-icon'></div>
             </div>
-            <div className='board-detail-bottom-button-text'>{`댓글 ${12}`}</div>
-            <div className='icon-button'>
-              <div className='icon up-light-icon'></div>
+            <div className='board-detail-bottom-button-text'>{`댓글 ${commentList.length}`}</div>
+            <div className='icon-button' onClick={onShowCommentClickHandler}>
+              {showComment ?
+                  <div className='icon up-light-icon'></div>
+                  :
+                  <div className='icon down-light-icon'></div>
+                
+                }
             </div>
           </div>
         </div>
+        {showFavorite &&
         <div className='board-detail-bottom-favorite-box'>
           <div className='board-detail-bottom-favorite-container'>
-            <div className='board-detail-bottom-favorite-title'>{'좋아요 '}<span className='emphasis'>{12}</span></div>
+            <div className='board-detail-bottom-favorite-title'>{'좋아요 '}<span className='emphasis'>{favoriteList.length}</span></div>
             <div className='board-detail-bottom-favorite-contents'>
               {favoriteList.map(item => <FavoriteItem favoriteListItem={item} />)}
             </div>
           </div> 
         </div>
+        }
+        {showComment && 
+         
         <div className='board-detail-bottom-comment-box'>
           <div className='board-detail-bottom-comment-container'>
-            <div className='board-detail-bottom-comment-title'>{'댓글 '}<span className='emphasis'>{12}</span></div>
+            <div className='board-detail-bottom-comment-title'>{'댓글 '}<span className='emphasis'>{commentList.length}</span></div>
             <div className='board-detail-bottom-comment-list-container'>
               {commentList.map(item => <CommentItem commentListItem={item} />)}
             </div>
@@ -109,13 +216,14 @@ export default function BoardDetail() {
           </div>
           <div className='board-detail-bottom-comment-input-box'>
             <div className='board-detail-bottom-comment-input-container'>
-              <textarea className='board-detail-bottom-comment-textarea' placeholder='댓글을 작성해주세요.' />
+              <textarea ref={commentRef} className='board-detail-bottom-comment-textarea' placeholder='댓글을 작성해주세요.' value={comment} onChange={onCommentChangeHandler} />
               <div className='board-detail-bottom-comment-button-box'>
-                <div className='disable-button'>{'댓글작성'}</div>
+                <div className={comment === '' ? 'disable-button' : 'black-button'} onClick={onCommentSubmitButtonClickHandler}>{'댓글작성'}</div>
               </div>
             </div>
           </div>
         </div>
+        }
       </div>
     )
   }
