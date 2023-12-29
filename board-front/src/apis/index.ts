@@ -4,7 +4,7 @@ import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
 import { GetSignInUserResponseDto } from "./response/user";
 import { PostBoardRequestDto } from "./request/board";
-import { PostBoardResponseDto } from "./response/board";
+import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto } from "./response/board";
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -102,4 +102,38 @@ export const fileUploadReqeust = async (data: FormData) => {
             return null;
         })
     return result;
+}
+
+const GET_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
+const INCREASE_VIEW_COUNT_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/increase-view-count`;
+
+// 게시물 가져오기
+export const getBoardRequest = async (boardNumber: number | string) => {
+    const result = await axios.get(GET_BOARD_URL(boardNumber))
+        .then(response => {
+            const responseBody: GetBoardResponseDto = response.data;
+            return responseBody;
+        })
+        .catch(error => {
+            if (!error.response) return null;
+            const responseBody: ResponseDto = error.response.data;
+            return responseBody;
+        })
+        return result;
+}
+
+// 게시물 조회수 증가
+export const increaseViewCountRequest = async (boardNumber: number | string) => {
+    const result = await axios.get(INCREASE_VIEW_COUNT_URL(boardNumber))
+        .then(response => {
+            const responseBody: IncreaseViewCountResponseDto = response.data;
+            return responseBody;
+        })
+        .catch(error => {
+            if (!error.response) return null;
+            const responseBody: ResponseDto = error.response.data;
+            return responseBody;
+        })
+        
+        return result;
 }

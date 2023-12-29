@@ -12,6 +12,7 @@ import com.jun.boardback.dto.response.ResponseDto;
 import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
+import com.jun.boardback.dto.response.board.IncreaseViewCountResponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostCommentResponseDto;
 import com.jun.boardback.dto.response.board.PutFavoriteResponseDto;
@@ -54,9 +55,7 @@ public class BoardServiceImplement implements BoardService {
 
             imageEntities = imageRepository.findByBoardNumber(boardNumber);
 
-            BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
-            boardEntity.increasViewCount();
-            boardRepository.save(boardEntity);
+          
 
 
         } catch (Exception e) {
@@ -211,6 +210,27 @@ public class BoardServiceImplement implements BoardService {
 
         return GetCommentListResponseDto.success(resultSets);
 
+    }
+
+
+
+
+    @Override
+    public ResponseEntity<? super IncreaseViewCountResponseDto> increaseViewCount(Integer boardNumber) {
+        
+        try {
+
+            BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
+            if (boardEntity == null) return IncreaseViewCountResponseDto.noExistBoard();
+            boardEntity.increasViewCount();
+            boardRepository.save(boardEntity);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return IncreaseViewCountResponseDto.success();
     }
 
     

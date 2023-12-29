@@ -9,6 +9,10 @@ import defaultProfileImage from 'assets/image/default-profile-image.png';
 import { useLoginuserStore } from 'stores'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BOARD_PATH, BOARD_UPDATE_PATH, MAIN_PATH, USER_PATH } from 'constant'
+import { getBoardRequest, increaseViewCountRequest } from 'apis'
+import GetBoardResponseDto from 'apis/response/board/get-board.response.dto'
+import { ResponseDto } from 'apis/response'
+import { IncreaseViewCountResponseDto } from 'apis/response/board'
 
 // component: 게시물 상세 컴포넌트 //
 export default function BoardDetail() {
@@ -22,8 +26,19 @@ export default function BoardDetail() {
   // function: navivator //
   const navigator = useNavigate();
 
+  // function: increaseViewCountResponse //
+  const increaseViewCountResponse = (responseBody: IncreaseViewCountResponseDto | ResponseDto | null) => {
+    if (!responseBody) return;
+    const { code } = responseBody;
+    if (code === 'NB') alert('존재하지 않는 게시물입니다.');
+    if (code === 'DBE') alert('데이터 베이스 오류입니다.');
+  }
+
   // component: board detail 상단 컴포넌트 //
   const BoardDetailTop = () => {
+
+    // state: 작성자 여부 상태 //
+    const [isWriter, setIsWriter] = useState<boolean>(false);
 
     // state: board 상태 //
     const [board, setBoard] = useState<Board | null>(null);
@@ -31,13 +46,37 @@ export default function BoardDetail() {
     // state: more button //
     const [showMore, setShowMore] = useState<boolean>(false);
 
-    // event handler: more buuton click 이벤트 처리 //
+    // function: get board response //
+    const getBoardResponse = (responseBody: GetBoardResponseDto | ResponseDto | null) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물입니다.');
+      if (code === 'DBE') alert('데이터베이스 오류입니다.');
+      if (code !== 'SU') {
+        navigator(MAIN_PATH());
+        return;
+      }
+
+      // board 불러오기
+      const board: Board = {...responseBody as GetBoardResponseDto};
+      setBoard(board);
+
+      // loginUser 판별 및 작성자 판별(수정, 삭제 접근 제한)
+      if (!loginUser) {
+        setIsWriter(false);
+        return;
+      }
+      const isWriter =  loginUser.email === board.writerEmail;
+      setIsWriter(isWriter);
+    }
+
+    // event handler: nickname click 이벤트 처리 //
     const onNicknameClickHandler = () => {
       if (!board) return;
       navigator(USER_PATH(board.writerEmail));
     }
     
-    // event handler: nickname click 이벤트 처리 //
+    // event handler: more buuton click 이벤트 처리 //
     const onMoreButtonClickHandler = () => {
       setShowMore(!showMore);
     }
@@ -59,7 +98,11 @@ export default function BoardDetail() {
 
     // effect: 게시물 번호 path variable 바뀔 때 마다 //
     useEffect(() => {
-      setBoard(boardMock);
+      if (!boardNumber) {
+        navigator(MAIN_PATH());
+        return;
+      }
+      getBoardRequest(boardNumber).then(getBoardResponse);
     }, [boardNumber])
 
     
@@ -76,9 +119,11 @@ export default function BoardDetail() {
               <div className='board-detail-info-divider'>{'\|'}</div>
               <div className='board-detail-write-date'>{board.writeDateTime}</div>
             </div>
+            {isWriter &&
             <div className='icon-button' onClick={onMoreButtonClickHandler}>
               <div className='icon more-icon'></div>
             </div>
+            }
             {showMore &&
               <div className='board-detail-more-box'>
                 <div className='board-detail-update-button' onClick={onUpdateButtonClickHandler}>{'수정'}</div>
@@ -227,6 +272,18 @@ export default function BoardDetail() {
       </div>
     )
   }
+
+  // effect: 게시물 번호 path variable이 바뀔 때 마다 viewCount 증가 //
+  let effectFlag = true;
+  useEffect(() => {
+    if (!boardNumber) return;
+    if (effectFlag) {
+      effectFlag = false;
+      return;
+    }
+
+    increaseViewCountRequest(boardNumber).then(increaseViewCountResponse)
+  }, [boardNumber])
 
   // render: 게시물 상세 컴포넌트 렌더링 //
   return (
