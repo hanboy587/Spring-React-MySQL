@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostCommentRequestDto;
+import com.jun.boardback.dto.response.board.DeleteBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
@@ -23,4 +24,6 @@ public interface BoardService {
     ResponseEntity<? super PutFavoriteResponseDto> putFavorite(Integer boardNumber, String email);
 
     ResponseEntity<? super IncreaseViewCountResponseDto> increaseViewCount(Integer boardNumber);
+
+    ResponseEntity<? super DeleteBoardResponseDto> deleteBoard(Integer boardNumber, String email);
 }

@@ -19,9 +19,11 @@ const { nickname, profileImage, writeDatetime, content } = commentListItem;
 const getElapsedTime = () => {
     const now = dayjs().add(9, 'hour');
     const writeTime = dayjs(writeDatetime);
-
+    // console.log('comment 부분 작성 시간 :::::: ', writeDatetime);
+    
     // 작성 된 시간과 갭 초단위로 계산
     const gap = now.diff(writeTime, 's');
+    // console.log('comment 부분 gap :::::: ', gap);
     if (gap < 60) return `${gap}초 전`;
     if (gap < 3600) return `${Math.floor(gap / 60)}분 전`;
     if (gap < 86400) return `${Math.floor(gap / 3600)}시간 전`;

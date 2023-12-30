@@ -409,7 +409,10 @@ export default function Authentication() {
         setAddressErrorMsg('주소를 입력해주세요.');
       }
 
-      if (!agreedPersonal) setIsAgreedPersonalError(true);
+      if (!agreedPersonal) {
+        setIsAgreedPersonalError(true);
+        alert('개인정보 제공에 동의하지 않았습니다.');
+      }
 
       // 최종 data 검증
       if (!hasNickname || !isTellNumberPattern || !agreedPersonal) return;
@@ -420,6 +423,8 @@ export default function Authentication() {
 
       // axios 컴포넌트로 body 전달
       signUpRequest(requestBody).then(signUpResponse);
+
+      alert('가입을 축하합니다!');
 
     }
 
@@ -522,7 +527,7 @@ export default function Authentication() {
             {page === 2 && (
               <>
                 <InputBox ref={nicknameRef} label='닉네임*' type='text' placeholder='닉네임을 입력해주세요.' value={nickname} onChange={onNicknameChangeHandler} error={isNicknameError} message={nicknameErrorMsg} onKeyDown={onNicknameCKeyDownHandler}/>
-                <InputBox ref={tellNumberRef} label='휴대폰 번호*' type='text' placeholder='휴대폰 번호를 입력해주세요.' value={tellNumber} onChange={onTellNumberChangeHandler} error={isTellNumberError} message={tellNumberErrorMsg} onKeyDown={onTellNumberKeyDownHandler} />
+                <InputBox ref={tellNumberRef} label='휴대폰 번호*' type='text' placeholder='휴대폰 번호(숫자만)를 입력해주세요.' value={tellNumber} onChange={onTellNumberChangeHandler} error={isTellNumberError} message={tellNumberErrorMsg} onKeyDown={onTellNumberKeyDownHandler} />
                 <InputBox ref={addressRef} label='주소*' type='text' placeholder='우편번호 찾기' value={address} onChange={onAddressChangeHandler} error={isAddressError} message={addressErrorMsg} icon='expand-right-light-icon' onButtonClick={onAddressButtonClickHandler} onKeyDown={onAddressKeyDownHandler} />
                 <InputBox ref={addressDetailRef} label='상세 주소' type='text' placeholder='상세 주소를 입력해주세요.' value={addressDetail} onChange={onAddressDetailChangeHandler} error={false} onKeyDown={onAddressDetailKeyDownHandler} />
               </>

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostCommentRequestDto;
 import com.jun.boardback.dto.response.ResponseDto;
+import com.jun.boardback.dto.response.board.DeleteBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
@@ -190,7 +191,7 @@ public class BoardServiceImplement implements BoardService {
 
 
 
-
+    // 댓글 리스트 불러오기
     @Override
     public ResponseEntity<? super GetCommentListResponseDto> getCommentList(Integer boardNumber) {
 
@@ -214,7 +215,7 @@ public class BoardServiceImplement implements BoardService {
 
 
 
-
+    // 조회수 증가
     @Override
     public ResponseEntity<? super IncreaseViewCountResponseDto> increaseViewCount(Integer boardNumber) {
         
@@ -231,6 +232,40 @@ public class BoardServiceImplement implements BoardService {
         }
 
         return IncreaseViewCountResponseDto.success();
+    }
+
+
+
+    // 게시물 삭제
+    @Override
+    public ResponseEntity<? super DeleteBoardResponseDto> deleteBoard(Integer boardNumber, String email) {
+
+        try {
+            
+            boolean existedUser = userRepository.existsByEmail(email);
+            if (!existedUser) return DeleteBoardResponseDto.noExistUser();
+
+            BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
+            if (boardEntity == null) return DeleteBoardResponseDto.noExistBoard();
+
+            String writerEmail = boardEntity.getWriterEmail();
+            boolean isWriter = writerEmail.equals(email);
+            if (!isWriter) return DeleteBoardResponseDto.noPermission();
+
+            // 게시물 연관 데이터 모두 삭제
+            imageRepository.deleteByBoardNumber(boardNumber);
+            commentRepository.deleteByBoardNumber(boardNumber);
+            favoriteRepository.deleteByBoardNumber(boardNumber);
+            // 모두 삭제 후 entity 삭제
+            boardRepository.delete(boardEntity);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return DeleteBoardResponseDto.success();
     }
 
     

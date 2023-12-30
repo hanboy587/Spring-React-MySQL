@@ -3,8 +3,8 @@ import { SignInRequestDto, SignUpRequestDto } from "./request/auth";
 import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
 import { GetSignInUserResponseDto } from "./response/user";
-import { PostBoardRequestDto } from "./request/board";
-import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto } from "./response/board";
+import { PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
+import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto } from "./response/board";
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -15,14 +15,32 @@ const authorization = (accessToken: string) => {
     return { headers: { Authorization: `Bearer ${accessToken}` } }
 }
 
+// links //
+// 로그인 요청 //
 const SIGN_IN_URL = () => `${API_DOMAIN}/auth/sign-in`;
+// 회원가입 요청 //
 const SIGN_UP_URL = () => `${API_DOMAIN}/auth/sign-up`;
+// 게시물 작성 //
 const POST_BOARD_URL = () => `${API_DOMAIN}/board`;
+// 유저 로그인 정보 반환 //
 const GET_SIGN_IN_USER_URL = () => `${API_DOMAIN}/user`;
+// 게시물 가져오기 //
 const GET_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
+// 게시물 조회수 증가 //
 const INCREASE_VIEW_COUNT_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/increase-view-count`;
+// 좋아요 리스트 불러오기 //
 const GET_FAVORITE_LIST_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/favorite-list`;
+// 댓글 리스트 불러오기 //
 const GET_COMMENT_LIST_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/comment-list`;
+// 좋아요 누르기 동작 //
+const PUT_FAVORITE_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/favorite`;
+// 댓글 작성 //
+const POST_COMMENT_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/comment`;
+// 게시물 삭제 //
+const DELETE_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
+// 이미지 업로드 //
+const FILE_DOMAIN = `${DOMAIN}/file`
+const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
 
 // 로그인 요청 //
 export const signInRequest = async (requestBody: SignInRequestDto) => {
@@ -91,11 +109,9 @@ export const getSignInUserRequest = async (accessToken: string) => {
     return result;
 }
 
+
+
 // 이미지 업로드 //
-const FILE_DOMAIN = `${DOMAIN}/file`
-
-const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
-
 const multipartForm = { headers: { 'Content-Type': 'multipart/fomr-data' } };
 
 export const fileUploadReqeust = async (data: FormData) => {
@@ -112,7 +128,7 @@ export const fileUploadReqeust = async (data: FormData) => {
 
 
 
-// 게시물 가져오기
+// 게시물 가져오기 //
 export const getBoardRequest = async (boardNumber: number | string) => {
     const result = await axios.get(GET_BOARD_URL(boardNumber))
         .then(res => {
@@ -127,7 +143,7 @@ export const getBoardRequest = async (boardNumber: number | string) => {
         return result;
 }
 
-// 게시물 조회수 증가
+// 게시물 조회수 증가 //
 export const increaseViewCountRequest = async (boardNumber: number | string) => {
     const result = await axios.get(INCREASE_VIEW_COUNT_URL(boardNumber))
         .then(res => {
@@ -143,7 +159,7 @@ export const increaseViewCountRequest = async (boardNumber: number | string) => 
         return result;
 }
 
-// 좋아요 리스트 불러오기
+// 좋아요 리스트 불러오기 //
 export const getFavoriteListRequest = async (boardNumber: number | string) => {
     const result = await axios.get(GET_FAVORITE_LIST_URL(boardNumber))
         .then(res => {
@@ -158,7 +174,7 @@ export const getFavoriteListRequest = async (boardNumber: number | string) => {
         return result;
 }
 
-// 댓글 리스트 불러오기
+// 댓글 리스트 불러오기 //
 export const getCommentListRequest = async (boardNumber: number | string) => {
     const result = await axios.get(GET_COMMENT_LIST_URL(boardNumber))
         .then(res => {
@@ -172,4 +188,50 @@ export const getCommentListRequest = async (boardNumber: number | string) => {
         })
 
         return result;
+}
+
+// 좋아요 누르기 //
+export const putFavoriteRequest = async (boardNumber: number | string, accessToken: string) => {
+    const result = await axios.put(PUT_FAVORITE_URL(boardNumber), {}, authorization(accessToken))
+        .then(res => {
+            const responseBody: PutFavoriteResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+
+    return result;
+}
+
+// 댓글 작성 //
+export const postCommentRequest = async (boardNumber: number | string, requestBody: PostCommentRequestDto, accessToken: string) => {
+    const result = await axios.post(POST_COMMENT_URL(boardNumber), requestBody, authorization(accessToken))
+        .then(res => {
+            const responseBody: PostCommentResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+    return result;
+}
+
+// 게시물 삭제 //
+export const deleteBoardRequest = async (boardNumber: number | string, accessToken: string) => {
+    const result = await axios.delete(DELETE_BOARD_URL(boardNumber), authorization(accessToken))
+        .then(res => {
+            const responseBody: DeleteBoardResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+    return result;
 }
