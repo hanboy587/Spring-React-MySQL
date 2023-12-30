@@ -9,10 +9,11 @@ import defaultProfileImage from 'assets/image/default-profile-image.png';
 import { useLoginuserStore } from 'stores'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BOARD_PATH, BOARD_UPDATE_PATH, MAIN_PATH, USER_PATH } from 'constant'
-import { getBoardRequest, increaseViewCountRequest } from 'apis'
+import { getBoardRequest, getCommentListRequest, getFavoriteListRequest, increaseViewCountRequest } from 'apis'
 import GetBoardResponseDto from 'apis/response/board/get-board.response.dto'
 import { ResponseDto } from 'apis/response'
-import { IncreaseViewCountResponseDto } from 'apis/response/board'
+import { GetCommentListResponseDto, GetFavoriteListReponseDto, IncreaseViewCountResponseDto } from 'apis/response/board'
+import dayjs from 'dayjs';
 
 // component: 게시물 상세 컴포넌트 //
 export default function BoardDetail() {
@@ -46,9 +47,16 @@ export default function BoardDetail() {
     // state: more button //
     const [showMore, setShowMore] = useState<boolean>(false);
 
+    // function: writeDate format 변경 //
+    const getWriteDatetimeFormat = () => {
+      if (!board) return null;
+      const date = dayjs(board.writeDateTime);
+      return date.format('YYYY. MM. DD.');
+    }
+
     // function: get board response //
     const getBoardResponse = (responseBody: GetBoardResponseDto | ResponseDto | null) => {
-      if (!responseBody) return;
+      if (!responseBody) return ;
       const { code } = responseBody;
       if (code === 'NB') alert('존재하지 않는 게시물입니다.');
       if (code === 'DBE') alert('데이터베이스 오류입니다.');
@@ -69,6 +77,9 @@ export default function BoardDetail() {
       const isWriter =  loginUser.email === board.writerEmail;
       setIsWriter(isWriter);
     }
+
+    // // function: delete board response //
+    // const deleteBoardResponse = (responseBody: DeleteBoard)
 
     // event handler: nickname click 이벤트 처리 //
     const onNicknameClickHandler = () => {
@@ -117,7 +128,7 @@ export default function BoardDetail() {
               <div className='board-detail-writer-profile-image' style={{ backgroundImage: `url(${board?.writerProfileImage ? board.writerProfileImage : defaultProfileImage})` }}></div>
               <div className='board-detail-writer-nickname' onClick={onNicknameClickHandler}>{board.writerNickname}</div>
               <div className='board-detail-info-divider'>{'\|'}</div>
-              <div className='board-detail-write-date'>{board.writeDateTime}</div>
+              <div className='board-detail-write-date'>{getWriteDatetimeFormat()}</div>
             </div>
             {isWriter &&
             <div className='icon-button' onClick={onMoreButtonClickHandler}>
@@ -161,6 +172,37 @@ export default function BoardDetail() {
     // state: comment 상태 //
     const [comment, setComment] = useState<string>('');
 
+    // function: getFavoriteListResponse //
+    const getFavoriteListResponse = (responseBody: GetFavoriteListReponseDto | ResponseDto | null) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물입니다.');
+      if (code === 'DBE') alert('데이터 베이스 오류입니다.');
+      if (code !== 'SU') return;
+
+      const { favoriteList } = responseBody as GetFavoriteListReponseDto;
+      setFavoriteList(favoriteList);
+
+      if (!loginUser) {
+        setIsFavorite(false);
+        return;
+      } 
+      const isFavorite = favoriteList.findIndex(favorite => favorite.email === loginUser.email) !== -1;
+      setIsFavorite(isFavorite);
+    }
+
+    // function: getCommentListResponse //
+    const getCommentListResponse = (responseBody: GetCommentListResponseDto | ResponseDto | null) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물입니다.');
+      if (code === 'DBE') alert('데이터 베이스 오류입니다.');
+      if (code !== 'SU') return;
+
+      const { commentList } = responseBody as GetCommentListResponseDto;
+      setCommentList(commentList);
+    }
+
     // event handler: favorite click 이벤트 처리 //
     const onFavoriteClickHandler = () => {
       setIsFavorite(!isFavorite);
@@ -195,8 +237,9 @@ export default function BoardDetail() {
 
     // effect: 게시물 번호 path variable 바뀔 때 마다 //
     useEffect(() => {
-      setFavoriteList(favoriteListMock);
-      setCommentList(commentListMock);
+      if (!boardNumber) return;
+      getFavoriteListRequest(boardNumber).then(getFavoriteListResponse);
+      getCommentListRequest(boardNumber).then(getCommentListResponse);
     },[boardNumber])
     
     // render: board detail 하단 렌더링 //
@@ -259,6 +302,7 @@ export default function BoardDetail() {
           <div className='board-detail-bottom-comment-pagination-box'>
             <Pagination />
           </div>
+          {loginUser !== null && 
           <div className='board-detail-bottom-comment-input-box'>
             <div className='board-detail-bottom-comment-input-container'>
               <textarea ref={commentRef} className='board-detail-bottom-comment-textarea' placeholder='댓글을 작성해주세요.' value={comment} onChange={onCommentChangeHandler} />
@@ -267,6 +311,7 @@ export default function BoardDetail() {
               </div>
             </div>
           </div>
+          }
         </div>
         }
       </div>
