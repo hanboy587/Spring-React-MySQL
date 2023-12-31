@@ -32,7 +32,7 @@ const usePagination = <T>(countPerPage: number) => {
         setViewList(viewList);
     }
 
-    // function: viewPageList 추철 //
+    // function: viewPageList 추출 //
     const setViewPage = () => {
         const FIRST_INDEX = 10 * (currentSection - 1);
         const LAST_INDEX = totalPageList.length > 10 * currentSection ? 10 * currentSection : totalPageList.length;
@@ -43,31 +43,28 @@ const usePagination = <T>(countPerPage: number) => {
     // effect: totalList 변경 될 때 마다 //
     useEffect(() => {
         const totalPage = Math.ceil(totalList.length / countPerPage);
-        // 페이지 10개씩 출력 //
-        const totalSection = Math.ceil(totalList.length / (countPerPage * 10));
-        setTotalSection(totalSection);
-
         const totalPageList: number[] = [];
+        // 페이지 10개씩 출력 //
         for (let page = 1; page <= totalPage; page++) totalPageList.push(page);
         setTotalPageList(totalPageList);
-
+        
+        const totalSection = Math.ceil(totalList.length / (countPerPage * 10));
+        setTotalSection(totalSection);
 
         setCurrentPage(1);
         setCurrentSection(1);
 
         setView();
         setViewPage();
+        console.log('totalList : ', totalList);
+        console.log('viewPageList : ', viewPageList);
     }, [totalList]);
 
     // effect: currentPage가 변경 될 때 마다 //
-    useEffect(() => {
-        setView();
-    }, [currentPage]);
+    useEffect(setView, [currentPage]);
     
     // effect: currentSection가 변경 될 때 마다 //
-    useEffect(() => {
-        setViewPage();
-    }, [currentPage])
+    useEffect(setViewPage, [currentPage]);
 
     return {
         currentPage,

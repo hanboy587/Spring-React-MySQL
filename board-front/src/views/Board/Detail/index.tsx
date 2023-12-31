@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { useCookies } from 'react-cookie'
 import { responseEncoding } from 'axios'
 import { PostCommentRequestDto } from 'apis/request/board'
+import { usePagination } from 'hooks'
 
 // component: 게시물 상세 컴포넌트 //
 export default function BoardDetail() {
@@ -178,13 +179,28 @@ export default function BoardDetail() {
   // component: board detail 하단 컴포넌트 //
   const BoardDetailBottom = () => {
 
+
+
     // state: comment textarea 참조 상태 //
     const commentRef = useRef<HTMLTextAreaElement | null>(null);
 
+    // state: pagination 관련 상태 //
+    const { 
+      currentPage,
+      setCurrentPage,
+      currentSection,
+      setCurrentSection,
+      viewList,
+      viewPageList,
+      totalSection,
+      setTotalList 
+    } = usePagination<CommentListItem>(3);
+
+    // state: 전체 댓글 수 상태 //
+    const [totalCommentCount, setTotalCommentCount] = useState<number>(0);
+
     // state: favorite list 상태 //
     const [favoriteList, setFavoriteList] = useState<FavoriteListItem[]>([]);
-    // state: comment list 상태 //
-    const [commentList, setCommentList] = useState<CommentListItem[]>([]);
     // state: 좋아요 상태 //
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
     // state: show favorite 상태 //
@@ -222,7 +238,8 @@ export default function BoardDetail() {
       if (code !== 'SU') return;
 
       const { commentList } = responseBody as GetCommentListResponseDto;
-      setCommentList(commentList);
+      setTotalList(commentList);
+      setTotalCommentCount(commentList.length);
     }
 
     // function: putFavoriteResponse //
@@ -298,6 +315,8 @@ export default function BoardDetail() {
       getCommentListRequest(boardNumber).then(getCommentListResponse);
     },[boardNumber])
     
+    console.log('detail index : ', viewPageList);
+
     // render: board detail 하단 렌더링 //
     return (
       <div id='board-detail-bottom'>
@@ -324,7 +343,7 @@ export default function BoardDetail() {
             <div className='icon-button'>
               <div className='icon comment-icon'></div>
             </div>
-            <div className='board-detail-bottom-button-text'>{`댓글 ${commentList.length}`}</div>
+            <div className='board-detail-bottom-button-text'>{`댓글 ${totalCommentCount}`}</div>
             <div className='icon-button' onClick={onShowCommentClickHandler}>
               {showComment ?
                   <div className='icon up-light-icon'></div>
@@ -349,14 +368,21 @@ export default function BoardDetail() {
          
         <div className='board-detail-bottom-comment-box'>
           <div className='board-detail-bottom-comment-container'>
-            <div className='board-detail-bottom-comment-title'>{'댓글 '}<span className='emphasis'>{commentList.length}</span></div>
+            <div className='board-detail-bottom-comment-title'>{'댓글 '}<span className='emphasis'>{totalCommentCount}</span></div>
             <div className='board-detail-bottom-comment-list-container'>
-              {commentList.map(item => <CommentItem commentListItem={item} />)}
+              {viewList.map(item => <CommentItem commentListItem={item} />)}
             </div>
           </div>
           <div className='divider'></div>
           <div className='board-detail-bottom-comment-pagination-box'>
-            <Pagination />
+            <Pagination
+              currentPage={currentPage}
+              currentSection={currentSection}
+              setCurrentPage={setCurrentPage}
+              setCurrentSection={setCurrentSection}
+              viewPageList={viewPageList}
+              totalSection={totalSection}
+            />
           </div>
           {loginUser !== null && 
           <div className='board-detail-bottom-comment-input-box'>

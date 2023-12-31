@@ -2,6 +2,7 @@ package com.jun.boardback.controller;
 
 import javax.validation.Valid;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jun.boardback.dto.request.auth.board.PatchBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostCommentRequestDto;
 import com.jun.boardback.dto.response.board.DeleteBoardResponseDto;
@@ -21,6 +23,7 @@ import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.IncreaseViewCountResponseDto;
+import com.jun.boardback.dto.response.board.PatchBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostCommentResponseDto;
 import com.jun.boardback.dto.response.board.PutFavoriteResponseDto;
@@ -76,20 +79,32 @@ public class BoardController {
     public ResponseEntity<? super PostCommentResponseDto> postComment(
         @RequestBody @Valid PostCommentRequestDto requestBody,
         @PathVariable("boardNumber") Integer baordNumber,
-        @AuthenticationPrincipal String email
-    ) {
+        @AuthenticationPrincipal String email) {
         ResponseEntity<? super PostCommentResponseDto> response = boardService.postComment(requestBody, email, baordNumber);
         return response;
     }
 
     @PutMapping("/{boardNumber}/favorite")
-    public ResponseEntity<? super PutFavoriteResponseDto> putFavorite(@PathVariable("boardNumber") Integer boardNumber, @AuthenticationPrincipal String email) {
+    public ResponseEntity<? super PutFavoriteResponseDto> putFavorite(
+        @PathVariable("boardNumber") Integer boardNumber, 
+        @AuthenticationPrincipal String email) {
         ResponseEntity<? super PutFavoriteResponseDto> response = boardService.putFavorite(boardNumber, email);
         return response;
     }
 
+    @PatchMapping("/{boardNumber}")
+    public ResponseEntity<? super PatchBoardResponseDto> patchBoard(
+        @RequestBody @Valid PatchBoardRequestDto requestBody, 
+        @PathVariable("boardNumber") Integer boardNumber, 
+        @AuthenticationPrincipal String email) {
+        ResponseEntity<? super PatchBoardResponseDto> response = boardService.patchBoard(requestBody, boardNumber, email);
+        return response;
+    }
+
     @DeleteMapping("/{boardNumber}")
-    public ResponseEntity<? super DeleteBoardResponseDto> deleteBoard(@PathVariable("boardNumber") Integer boardNumber, @AuthenticationPrincipal String email) {
+    public ResponseEntity<? super DeleteBoardResponseDto> deleteBoard(
+        @PathVariable("boardNumber") Integer boardNumber, 
+        @AuthenticationPrincipal String email) {
         ResponseEntity<? super DeleteBoardResponseDto> response = boardService.deleteBoard(boardNumber, email);
         return response;
     }

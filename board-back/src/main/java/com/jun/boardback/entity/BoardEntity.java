@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.jun.boardback.dto.request.auth.board.PatchBoardRequestDto;
 import com.jun.boardback.dto.request.auth.board.PostBoardRequestDto;
 
 import lombok.AllArgsConstructor;
@@ -69,5 +70,12 @@ public class BoardEntity {
     // 댓글 1 증가
     public void increaseCommentCount() {
         this.commentCount++;
+    }
+
+    // 게시물 수정
+    public void patchBoard(PatchBoardRequestDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        
     }
 }
