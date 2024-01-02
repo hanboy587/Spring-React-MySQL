@@ -10,6 +10,7 @@ import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.GetLatestBoardListResponseDto;
+import com.jun.boardback.dto.response.board.GetTop3BoardListResponseDto;
 import com.jun.boardback.dto.response.board.IncreaseViewCountResponseDto;
 import com.jun.boardback.dto.response.board.PatchBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
@@ -21,6 +22,7 @@ public interface BoardService {
     ResponseEntity<? super GetCommentListResponseDto> getCommentList(Integer boardNumber);
     ResponseEntity<? super GetFavoriteListReponseDto> getFavoriteList(Integer boardNumber);
     ResponseEntity<? super GetLatestBoardListResponseDto> getLatestBoardList();
+    ResponseEntity<? super GetTop3BoardListResponseDto> getTop3BoardList();
     
     ResponseEntity<? super PostBoardResponseDto> postBoard(PostBoardRequestDto dto, String email);
     ResponseEntity<? super PostCommentResponseDto> postComment(PostCommentRequestDto dto, String email, Integer boardNumber);
