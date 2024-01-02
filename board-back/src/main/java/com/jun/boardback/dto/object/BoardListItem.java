@@ -1,5 +1,10 @@
 package com.jun.boardback.dto.object;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.jun.boardback.entity.BoardListViewEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +24,26 @@ public class BoardListItem {
     private String writeDataTime;
     private String writerNickname;
     private String writerProfilImage;
+
+    public BoardListItem(BoardListViewEntity boardListViewEntity) {
+        this.boardNumber = boardListViewEntity.getBoardNumber();
+        this.title = boardListViewEntity.getTitle();
+        this.content = boardListViewEntity.getContent();
+        this.boardTitleImage = boardListViewEntity.getTitleImage();
+        this.favoriteCount = boardListViewEntity.getFavoriteCount();
+        this.commentCount = boardListViewEntity.getCommentCount();
+        this.viewCount = boardListViewEntity.getViewCount();
+        this.writeDataTime = boardListViewEntity.getWriteDateTime();
+        this.writerNickname = boardListViewEntity.getWriterNickname();
+        this.writerProfilImage = boardListViewEntity.getWriterProfileImage();
+    }
+
+    public static List<BoardListItem> getList(List<BoardListViewEntity> boardListViewEntities) {
+        List<BoardListItem> list = new ArrayList<>();
+        for (BoardListViewEntity boardListViewEntity: boardListViewEntities) {
+            BoardListItem boardListItem = new BoardListItem(boardListViewEntity);
+            list.add(boardListItem);
+        }
+        return list;
+    }
 }
