@@ -97,6 +97,7 @@ export default function BoardDetail() {
       if (code === 'DBE') alert('데이터베이스 오류입니다.');
       if (code !== 'SU') return;
 
+      
       alert('게시물이 삭제 되었습니다.');
       navigator(MAIN_PATH());
     }
@@ -126,8 +127,13 @@ export default function BoardDetail() {
       if (!boardNumber || !board || !loginUser || !cookies.accessToken) return;
       // 본인이 아니면 삭제 불가
       if (loginUser.email !== board.writerEmail) return;
+      if (window.confirm('정말로 게시물을 삭제하시겠습니까?')) {
+        deleteBoardRequest(boardNumber, cookies.accessToken).then(deleteBoardResponse);
+      } else {
+        return;
+      }
       
-      deleteBoardRequest(boardNumber, cookies.accessToken).then(deleteBoardResponse);
+      
     }
 
     // effect: 게시물 번호 path variable 바뀔 때 마다 //

@@ -3,8 +3,8 @@ import { SignInRequestDto, SignUpRequestDto } from "./request/auth";
 import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
 import { GetSignInUserResponseDto } from "./response/user";
-import { PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
-import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto } from "./response/board";
+import { PatchBoardRequestDto, PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
+import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto } from "./response/board";
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -38,6 +38,8 @@ const PUT_FAVORITE_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/
 const POST_COMMENT_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/comment`;
 // 게시물 삭제 //
 const DELETE_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
+// 게시물 수정 //
+const PATCH_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
 // 이미지 업로드 //
 const FILE_DOMAIN = `${DOMAIN}/file`
 const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
@@ -233,5 +235,21 @@ export const deleteBoardRequest = async (boardNumber: number | string, accessTok
             const responseBody: ResponseDto = err.response.data;
             return responseBody;
         })
+    return result;
+}
+
+// 게시물 수정 //
+export const patchBoardRequest = async (boardNumber: number | string, requestBody: PatchBoardRequestDto, accessToken: string) => {
+    const result = await axios.patch(PATCH_BOARD_URL(boardNumber), requestBody, authorization(accessToken))
+        .then(res => {
+            const responseBody: PatchBoardResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+
     return result;
 }
