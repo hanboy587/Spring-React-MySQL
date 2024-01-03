@@ -1,0 +1,27 @@
+#search-wrapper {
+    padding: 40px 0;
+
+    display: flex;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.search-container {
+    width: 1200px;
+    min-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.search-title-box {
+    display: flex;
+    gap: 8px;
+}
+
+.search-title {
+    color: rgba(0, 0, 0, 1);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 140%;
+}

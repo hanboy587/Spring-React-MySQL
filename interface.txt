@@ -45,7 +45,7 @@ signUp (회원가입)
     *email: String,
     *password: String,
     *nickname: String,
-    *telNumber: String,
+    *tellNumber: String,
     *address: String,
     addresDetail: String
 }
