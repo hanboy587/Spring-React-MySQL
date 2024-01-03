@@ -4,7 +4,8 @@ import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
 import { GetSignInUserResponseDto } from "./response/user";
 import { PatchBoardRequestDto, PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
-import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto } from "./response/board";
+import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto, GetLatestBoardListResponseDto, GetTop3BoardListResponseDto } from "./response/board";
+import { GetPopularListResponseDto } from "./response/search";
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -43,6 +44,11 @@ const PATCH_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/$
 // 이미지 업로드 //
 const FILE_DOMAIN = `${DOMAIN}/file`
 const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
+
+// main 화면 그리기 //
+const GET_LATEST_BOARD_LIST_URL = () => `${API_DOMAIN}/board/latest-list`;
+const GET_TOP_3_BOARD_LIST_URL = () => `${API_DOMAIN}/board/top-3`;
+const GET_POPULAR_LIST_URL = () => `${API_DOMAIN}/search/popular-list`;
 
 // 로그인 요청 //
 export const signInRequest = async (requestBody: SignInRequestDto) => {
@@ -243,6 +249,54 @@ export const patchBoardRequest = async (boardNumber: number | string, requestBod
     const result = await axios.patch(PATCH_BOARD_URL(boardNumber), requestBody, authorization(accessToken))
         .then(res => {
             const responseBody: PatchBoardResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+
+    return result;
+}
+
+// 최근 게시물 불러오기 //
+export const getLatestBoardListRequest = async () => {
+    const result = await axios.get(GET_LATEST_BOARD_LIST_URL())
+        .then(res => {
+            const responseBody: GetLatestBoardListResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+
+    return result;
+}
+
+// 조회수 top 3 게시물 불러오기 //
+export const getTop3BoardListRequest = async () => {
+    const result = await axios.get(GET_TOP_3_BOARD_LIST_URL())
+        .then(res => {
+            const responseBody: GetTop3BoardListResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+    return result;
+}
+
+
+// 인기 검색어 불러오기 //
+export const getPopularListRequest = async () => {
+    const result = await axios.get(GET_POPULAR_LIST_URL())
+        .then(res => {
+            const responseBody: GetPopularListResponseDto = res.data;
             return responseBody;
         })
         .catch(err => {

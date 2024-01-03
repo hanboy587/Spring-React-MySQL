@@ -221,12 +221,15 @@ const UploadButton = () => {
       const requestBody: PostBoardRequestDto = {
         title, content, boardImageList
       }
+      console.log('게시물 작성 동작');
+      alert('게시물이 작성 되었습니다.');
       postBoardRequest(requestBody, accessToken).then(postBoardResponse);
     } else {
       if (!boardNumber) return;
       const requestBody: PatchBoardRequestDto = {
         title, content, boardImageList
       }
+      console.log('게시물 수정 동작');
       patchBoardRequest(boardNumber, requestBody, accessToken).then(patchBoardResponse);
     }
 
@@ -234,7 +237,7 @@ const UploadButton = () => {
       title, content, boardImageList
     }
 
-    postBoardRequest(requestBody, accessToken).then(postBoardResponse);
+    // postBoardRequest(requestBody, accessToken).then(postBoardResponse);
   }
 
 
