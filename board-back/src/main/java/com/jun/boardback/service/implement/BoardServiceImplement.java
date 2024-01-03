@@ -19,6 +19,7 @@ import com.jun.boardback.dto.response.board.GetBoardResponseDto;
 import com.jun.boardback.dto.response.board.GetCommentListResponseDto;
 import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.GetLatestBoardListResponseDto;
+import com.jun.boardback.dto.response.board.GetSearchBoardListResponseDto;
 import com.jun.boardback.dto.response.board.GetTop3BoardListResponseDto;
 import com.jun.boardback.dto.response.board.IncreaseViewCountResponseDto;
 import com.jun.boardback.dto.response.board.PatchBoardResponseDto;
@@ -30,11 +31,13 @@ import com.jun.boardback.entity.BoardListViewEntity;
 import com.jun.boardback.entity.CommentEntity;
 import com.jun.boardback.entity.FavoriteEntity;
 import com.jun.boardback.entity.ImageEntity;
+import com.jun.boardback.entity.SearchLogEntity;
 import com.jun.boardback.repository.BoardListViewRepository;
 import com.jun.boardback.repository.BoardRepository;
 import com.jun.boardback.repository.CommentRepository;
 import com.jun.boardback.repository.FavoriteRepository;
 import com.jun.boardback.repository.ImageRepository;
+import com.jun.boardback.repository.SearchLogRepsitory;
 import com.jun.boardback.repository.UserRepository;
 import com.jun.boardback.repository.resultSet.GetBoardResultSet;
 import com.jun.boardback.repository.resultSet.GetCommentListResultSet;
@@ -53,6 +56,7 @@ public class BoardServiceImplement implements BoardService {
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
     private final BoardListViewRepository boardListViewRepository;
+    private final SearchLogRepsitory searchLogRepsitory;
 
     @Override
     public ResponseEntity<? super GetBoardResponseDto> getBoard(Integer boardNumber) {
@@ -341,7 +345,7 @@ public class BoardServiceImplement implements BoardService {
 
 
 
-
+    // top3 게시물 불러오기
     @Override
     public ResponseEntity<? super GetTop3BoardListResponseDto> getTop3BoardList() {
 
@@ -360,6 +364,35 @@ public class BoardServiceImplement implements BoardService {
         }
 
         return GetTop3BoardListResponseDto.success(boardListViewEntities);
+    }
+
+
+
+    // 검색어 리스트 불러오기
+    @Override
+    public ResponseEntity<? super GetSearchBoardListResponseDto> getSearchBoardList(String searchWord, String preSearchWord) {
+
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+
+        try {
+
+            boardListViewEntities = boardListViewRepository.findByTitleContainsOrContentContainsOrderByWriteDatetimeDesc(searchWord, searchWord);
+
+            SearchLogEntity searchLogEntity = new SearchLogEntity(searchWord, preSearchWord, false);
+            searchLogRepsitory.save(searchLogEntity);
+            
+            boolean relation = preSearchWord != null;
+            if (relation) {
+                searchLogEntity = new SearchLogEntity(preSearchWord, searchWord, relation);
+                searchLogRepsitory.save(searchLogEntity);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+    
+        return GetSearchBoardListResponseDto.success(boardListViewEntities);
     }
 
     
