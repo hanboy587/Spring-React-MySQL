@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import './style.css'
 import defaultProfileImage from 'assets/image/default-profile-image.png'
 import { useParams } from 'react-router-dom';
@@ -24,9 +24,38 @@ export default function User() {
     // state: 닉네임 상태 //
     const [nickname, setNickname] = useState<string>('');
     // state: 변경 닉네임 상태 //
-    const [nicknameChange, setNicknameChange] = useState<string>('');
+    const [changeNickname, setChangeNickname] = useState<string>('');
     // state: 닉네임 변경 여부 //
-    const [isChangeNickname, setChangeNickname] = useState<boolean>(false);
+    const [isNicknameChange, setIsNicknameChange] = useState<boolean>(false);
+
+    // event handler: nicknameEditButtonClickHandler //
+    const onNicknameEditButtonClickHandler = () => {
+      setChangeNickname(nickname);
+      setIsNicknameChange(!isNicknameChange);
+    }
+
+    //  event handler: profileBoxClickHandler //
+    const onProfileBoxClickHandler = () => {
+      if (!isMypage) return;
+      if (!imageInputRef.current) return;
+      imageInputRef.current.click();
+    }
+
+    // event handler: onProfileImageChangeHandler //
+    const onProfileImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files || !event.target.files?.length) return;
+
+      const file = event.target.files[0];
+      const data = new FormData();
+      data.append('file', file);
+    }
+
+    // event handler: onNicknameChangeHandler //
+    const onNicknameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setChangeNickname(value);
+    }
+
 
     // effect: user email patt variable 변경 시 //
     useEffect(() => {
@@ -36,21 +65,20 @@ export default function User() {
       setProfileImage(defaultProfileImage);
     }, [userEmail])
 
+
     // render: 유저 상단 화면 렌더링 //
     return(
       <div id='user-top-wrapper'>
         <div className='user-top-container'>
           {isMypage ? 
-            <div className='user-top-my-profile-image-box'>
+            <div className='user-top-my-profile-image-box' onClick={onProfileBoxClickHandler}>
               {profileImage !== null ?
                 <div className='user-top-profile-iamge' style={{ backgroundImage: `url(${profileImage})` }}></div> :
-                <div className='user-top-my-profile-image-nothing-box'>
-                  <div className='icon-box-large'>
-                    <div className='icon image-box-white-icon'></div>
-                  </div>
+                <div className='icon-box-large'>
+                  <div className='icon image-box-white-icon'></div>
                 </div>
               }
-              <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} />
+              <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} onChange={onProfileImageChangeHandler} />
             </div> :
             <div className='user-top-profile-image-box' style={{ backgroundImage: `url(${profileImage ? profileImage : defaultProfileImage})` }}></div>
           }
@@ -59,11 +87,11 @@ export default function User() {
             <div className='user-top-info-nickname-box'>
               {isMypage ? 
                 <>
-                  {isChangeNickname ?
-                    <input className='user-top-info-nickname-input' type='text' size={nicknameChange.length + 1} value={nicknameChange} /> :
+                  {isNicknameChange ?
+                    <input className='user-top-info-nickname-input' type='text' size={changeNickname.length + 2} value={changeNickname} onChange={onNicknameChangeHandler} /> :
                     <div className='user-top-info-nickname'>{nickname}</div>
                   }
-                  <div className='icon-button'>
+                  <div className='icon-button' onClick={onNicknameEditButtonClickHandler}>
                     <div className='icon edit-icon'></div>
                   </div>
                 </> :
