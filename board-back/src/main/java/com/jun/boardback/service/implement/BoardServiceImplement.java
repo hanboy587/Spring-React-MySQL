@@ -21,6 +21,7 @@ import com.jun.boardback.dto.response.board.GetFavoriteListReponseDto;
 import com.jun.boardback.dto.response.board.GetLatestBoardListResponseDto;
 import com.jun.boardback.dto.response.board.GetSearchBoardListResponseDto;
 import com.jun.boardback.dto.response.board.GetTop3BoardListResponseDto;
+import com.jun.boardback.dto.response.board.GetUserBoardListResponseDto;
 import com.jun.boardback.dto.response.board.IncreaseViewCountResponseDto;
 import com.jun.boardback.dto.response.board.PatchBoardResponseDto;
 import com.jun.boardback.dto.response.board.PostBoardResponseDto;
@@ -393,6 +394,29 @@ public class BoardServiceImplement implements BoardService {
         }
     
         return GetSearchBoardListResponseDto.success(boardListViewEntities);
+    }
+
+
+
+
+    @Override
+    public ResponseEntity<? super GetUserBoardListResponseDto> getUserBoardList(String email) {
+        
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+
+        try {
+
+            boolean existedUser = userRepository.existsByEmail(email);
+            if (!existedUser) return GetUserBoardListResponseDto.noExistUser();
+
+            boardListViewEntities = boardListViewRepository.findByWriterEmailOrderByWriteDatetimeDesc(email);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return GetUserBoardListResponseDto.success(boardListViewEntities);
     }
 
     
