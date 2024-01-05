@@ -15,12 +15,12 @@ public interface SearchLogRepsitory extends JpaRepository<SearchLogEntity, Integ
     
     @Query(
         value=
-        "SELECT search_word, count(search_word) AS count " +
+        "SELECT search_word as searchWord, count(search_word) AS count " +
         "FROM search_log " +
         "WHERE relation IS FALSE " +
         "GROUP BY search_word " +
         "ORDER BY count DESC " +
-        "LIMIT 15 ",
+        "LIMIT 8 ",
         nativeQuery = true
     )
     List<GetPopularListResultSet> getPopularList();

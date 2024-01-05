@@ -4,7 +4,7 @@ import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
 import { GetSignInUserResponseDto } from "./response/user";
 import { PatchBoardRequestDto, PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
-import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto, GetLatestBoardListResponseDto, GetTop3BoardListResponseDto, GetSearchBoardListResponseDto } from "./response/board";
+import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto, GetLatestBoardListResponseDto, GetTop3BoardListResponseDto, GetSearchBoardListResponseDto, GetUserBoardListResponseDto } from "./response/board";
 import { GetPopularListResponseDto, GetRealationListResponseDto } from "./response/search";
 
 const DOMAIN = 'http://localhost:4000';
@@ -37,6 +37,8 @@ const GET_COMMENT_LIST_URL = (boardNumber: number | string) => `${API_DOMAIN}/bo
 const GET_SEARCH_BOARD_LIST_URL = (searchWord: string, preSearchWord: string | null) => `${API_DOMAIN}/board/search-list/${searchWord}${preSearchWord ? '/' + preSearchWord : ''}`;
 // 연관 검색어 리스트 불러오기 //
 const GET_RELATION_LIST_URL = (searchWord: string) => `${API_DOMAIN}/search/${searchWord}/relation-list`;
+// 내 게시물 불러오기 //
+const GET_USER_BOARD_LIST_URL = (email: string) => `${API_DOMAIN}/board/user-board-list/${email}`
 // 좋아요 누르기 동작 //
 const PUT_FAVORITE_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/favorite`;
 // 댓글 작성 //
@@ -333,6 +335,22 @@ export const getRelationListRequest = async (searchWord: string) => {
     const result = await axios.get(GET_RELATION_LIST_URL(searchWord))
         .then(res => {
             const responseBody: GetRealationListResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+
+    return result;
+}
+
+// 내 게시물 불러오기 //
+export const userBoardListrequest = async (email: string) => {
+    const result = await axios.get(GET_USER_BOARD_LIST_URL(email))
+        .then(res => {
+            const responseBody: GetUserBoardListResponseDto = res.data;
             return responseBody;
         })
         .catch(err => {

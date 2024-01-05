@@ -1,13 +1,25 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import './style.css'
 import defaultProfileImage from 'assets/image/default-profile-image.png'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { BoardListItem } from 'types/interface';
+import { latestBoardListMock } from 'mocks';
+import BoardItem from 'components/BoardItem';
+import { BOARD_PATH, BOARD_WRITE_PATH, USER_PATH } from 'constant';
+import { useLoginuserStore } from 'stores';
 
 // component: 유저 컴포넌트 //
 export default function User() {
 
-  // state: //
+  // state: userEmail path variable //
   const { userEmail } = useParams();
+  // state: 마이페이지 확인 //
+  const [isMypage, setMypage] = useState<boolean>(false);
+  // state: loginUser 상태 //
+  const { loginUser } = useLoginuserStore();
+
+  // function: navigator //
+  const navigator = useNavigate();
 
   // component: 유저 상단 화면 //
   const UserTop = () => {
@@ -15,8 +27,7 @@ export default function User() {
     // state: 이미지 파일 참조 상태 //
     const imageInputRef = useRef<HTMLInputElement | null>(null);
     
-    // state: 마이페이지 확인 //
-    const [isMypage, setMypage] = useState<boolean>(true);
+    
 
     // state: 프로필 이미지 상태 //
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -108,10 +119,59 @@ export default function User() {
 
   // component: 유저 하단 화면 //
   const UserBottom = () => {
-    
+
+    // state: 게시물 갯수 상태 //
+    const [count, setCount] = useState<number>(2);
+    // state: 게시물 리스트 상태 임시 //
+    const [userBoardList, setUserBoardList] = useState<BoardListItem[]>([]);
+
+    // event handler: sideCardClickHandler //
+    const onSideCardClickHanlder = () => {
+      if (isMypage) navigator(BOARD_PATH() + '/' + BOARD_WRITE_PATH());
+      else if (loginUser) navigator(USER_PATH(loginUser.email));
+    }
+
+    // effect: userEmail path variable 변경 시 //
+    useEffect(() => {
+      setUserBoardList(latestBoardListMock);
+    }, [userEmail])
+
     // render: 유저 하단 화면 렌더링 //
     return(
-      <div></div>
+      <div id='user-bottom-wrapper'>
+        <div className='user-bottom-container'>
+          <div className='user-bottom-title'>{isMypage ? '내 게시물' : '게시물 '}<span className='emphasis'>{count}</span></div>
+          <div className='user-bottom-contents-box'>
+            {count === 0 ?
+              <div className='user-bottom-contents-nothing'>{'게시물이 없습니다.'}</div> :
+              <div className='user-bottom-contents'>
+                {userBoardList.map(item => <BoardItem boardListItem={item} />)}
+              </div>
+            }
+            <div className='user-bottom-side-box'>
+              <div className='user-bottom-side-card' onClick={onSideCardClickHanlder}>
+                <div className='user-bottom-side-container'>
+                  {isMypage ? 
+                    <>
+                      <div className='icon-box'>
+                        <div className='icon edit-icon'></div>
+                      </div>
+                      <div className='user-bottom-side-text'>{'글쓰기'}</div>
+                    </> :
+                    <>
+                      <div className='user-bottom-side-text'>{'내 게시물로 가기'}</div>
+                      <div className='icon-box'>
+                        <div className='icon arrow-right-icon'></div>
+                      </div>
+                    </>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='user-bottom-pagination-box'></div>
+        </div>
+      </div>
     )
   }
 

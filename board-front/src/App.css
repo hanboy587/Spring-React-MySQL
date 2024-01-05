@@ -235,6 +235,9 @@
     background-image: url(assets/image/image-box-white-light.png);
 }
 
+.arrow-right-icon {
+    background-image: url(assets/image/arrow-right.png);
+}
 
 .auth-description-box {
     display: flex;
