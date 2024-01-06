@@ -7,7 +7,7 @@ import { latestBoardListMock } from 'mocks';
 import BoardItem from 'components/BoardItem';
 import { BOARD_PATH, BOARD_WRITE_PATH, MAIN_PATH, USER_PATH } from 'constant';
 import { useLoginuserStore } from 'stores';
-import { fileUploadReqeust, getUserBoardListrequest, getUserRequest, patchNicknameRequest, patchProfileImageRequest } from 'apis';
+import { fileUploadReqeust, getUserBoardListRequest, getUserRequest, patchNicknameRequest, patchProfileImageRequest } from 'apis';
 import { GetUserResponseDto, PatchNicknameResponseDto, PatchProfileImageResponseDto } from 'apis/response/user';
 import { ResponseDto } from 'apis/response';
 import { PatchNicknameRequestDto, PatchProfileImageRequestDto } from 'apis/request/user';
@@ -46,18 +46,42 @@ export default function User() {
     // state: 닉네임 변경 여부 //
     const [isNicknameChange, setIsNicknameChange] = useState<boolean>(false);
 
+    // function: getUserResponse //
+    const getUserResponse = (responseBody: GetUserResponseDto | ResponseDto | null) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+      if (code === 'NU') alert('존재하지 않는 유저입니다.');
+      if (code === 'DBE') alert('데이터 베이스 에러입니다.');
+      if (code !== 'SU'){
+        navigator(MAIN_PATH());
+        return;
+      }
+      // console.log('getUserResponse 동작1 :', responseBody);
+
+      const { email, nickname, profileImage } = responseBody as GetUserResponseDto;
+      setNickname(nickname);
+      setProfileImage(profileImage);
+      const isMypage = email === loginUser?.email;
+      setMypage(isMypage);
+      // console.log('getUserResponse 동작2 :', responseBody);
+    }
+
     // function: fileUploadResponse //
     const fileUploadResponse = (profileImage: string | null) => {
       if (!profileImage) return;
-      if (!cookies.accesToken) return;
+      // console.log('fileUploadResponse profile image 있음')
+      if (!cookies.accessToken) return;
+      // console.log('fileUploadResponse token 있음')
 
       const requestBody: PatchProfileImageRequestDto = { profileImage };
-      patchProfileImageRequest(requestBody, cookies.accesToken).then(patchProfileImageResponse);
+      patchProfileImageRequest(requestBody, cookies.accessToken).then(patchProfileImageResponse);
+      alert('프로필 이미지가 변경 되었습니다.');
     }
 
     // function: patchProfileImageResponse //
     const patchProfileImageResponse = (responseBody: PatchProfileImageResponseDto | ResponseDto | null) => {
       if (!responseBody) return;
+      console.log('patchProfileImageResponse 동작 : ', responseBody);
       const { code } = responseBody;
       if (code === 'VF') alert('잘못된 접근입니다.');
       if (code === 'NU') alert('존재하지 않는 유저입니다.');
@@ -73,6 +97,7 @@ export default function User() {
     // function: patchNicknameResponse //
     const patchNicknameResponse = (responseBody: PatchNicknameResponseDto | ResponseDto | null) => {
       if (!responseBody) return;
+      console.log('patchNicknameResponse 동작 : ', responseBody);
       const { code } = responseBody;
       if (code === 'VF') alert('닉네임은 필수입니다.');
       if (code === 'DN') alert('중복되는 닉네임입니다.');
@@ -109,8 +134,6 @@ export default function User() {
       imageInputRef.current.click();
     }
 
-    
-
     // event handler: onProfileImageChangeHandler //
     const onProfileImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
       // console.log('onProfileChange 동작 : ', event.target.files);
@@ -132,23 +155,7 @@ export default function User() {
       setChangeNickname(value);
     }
 
-    // function: getUserResponse //
-    const getUserResponse = (responseBody: GetUserResponseDto | ResponseDto | null) => {
-      if (!responseBody) return;
-      const { code } = responseBody;
-      if (code === 'NU') alert('존재하지 않는 유저입니다.');
-      if (code === 'DBE') alert('데이터 베이스 에러입니다.');
-      if (code !== 'SU'){
-        navigator(MAIN_PATH());
-        return;
-      }
-
-      const { email, nickname, profileImage } = responseBody as GetUserResponseDto;
-      setNickname(nickname);
-      setProfileImage(profileImage);
-      const isMypage = email === loginUser?.email;
-      setMypage(isMypage);
-    }
+    
 
 
     // effect: user email path variable 변경 시 //
@@ -242,7 +249,7 @@ export default function User() {
     // effect: userEmail path variable 변경 시 //
     useEffect(() => {
       if (!userEmail) return;
-      getUserBoardListrequest(userEmail).then(getUserBoardListResponse);
+      getUserBoardListRequest(userEmail).then(getUserBoardListResponse);
     }, [userEmail])
 
     // render: 유저 하단 화면 렌더링 //

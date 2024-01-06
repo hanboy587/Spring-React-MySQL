@@ -74,6 +74,8 @@ export default function Main() {
       setTotalList 
     } = usePagination<BoardListItem>(5);
 
+    console.log('main 하단 viewList : ', viewList);
+
     // function: getLatestBoardListResponse //
     const getLatestBoardListResponse = (responseBody: GetLatestBoardListResponseDto | ResponseDto | null) => {
       if (!responseBody) return;

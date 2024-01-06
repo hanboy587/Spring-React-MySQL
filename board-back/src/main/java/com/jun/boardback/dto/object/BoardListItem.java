@@ -23,7 +23,7 @@ public class BoardListItem {
     private int viewCount;
     private String writeDatatime;
     private String writerNickname;
-    private String writerProfilImage;
+    private String writerProfileImage;
 
     public BoardListItem(BoardListViewEntity boardListViewEntity) {
         this.boardNumber = boardListViewEntity.getBoardNumber();
@@ -35,7 +35,7 @@ public class BoardListItem {
         this.viewCount = boardListViewEntity.getViewCount();
         this.writeDatatime = boardListViewEntity.getWriteDatetime();
         this.writerNickname = boardListViewEntity.getWriterNickname();
-        this.writerProfilImage = boardListViewEntity.getWriterProfileImage();
+        this.writerProfileImage = boardListViewEntity.getWriterProfileImage();
     }
 
     public static List<BoardListItem> getList(List<BoardListViewEntity> boardListViewEntities) {

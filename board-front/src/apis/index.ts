@@ -355,7 +355,7 @@ export const getRelationListRequest = async (searchWord: string) => {
 }
 
 // 내 게시물 불러오기 //
-export const getUserBoardListrequest = async (email: string) => {
+export const getUserBoardListRequest = async (email: string) => {
     const result = await axios.get(GET_USER_BOARD_LIST_URL(email))
         .then(res => {
             const responseBody: GetUserBoardListResponseDto = res.data;
