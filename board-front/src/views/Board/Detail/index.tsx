@@ -321,7 +321,7 @@ export default function BoardDetail() {
       getCommentListRequest(boardNumber).then(getCommentListResponse);
     },[boardNumber])
     
-    console.log('detail index : ', viewPageList);
+    // console.log('detail index : ', viewPageList);
 
     // render: board detail 하단 렌더링 //
     return (

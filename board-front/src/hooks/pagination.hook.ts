@@ -56,8 +56,8 @@ const usePagination = <T>(countPerPage: number) => {
 
         setView();
         setViewPage();
-        console.log('totalList : ', totalList);
-        console.log('viewPageList : ', viewPageList);
+        // console.log('totalList : ', totalList);
+        // console.log('viewPageList : ', viewPageList);
     }, [totalList]);
 
     // effect: currentPage가 변경 될 때 마다 //

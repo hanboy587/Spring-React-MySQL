@@ -18,8 +18,8 @@ export default function pagination(props: Props) {
   const { currentPage, currentSection, viewPageList, totalSection } = props;
   const { setCurrentPage, setCurrentSection } = props;
 
-  console.log('pagination currentPage : ', currentPage)
-  console.log('pagination viewPageList : ', viewPageList)
+  // console.log('pagination currentPage : ', currentPage)
+  // console.log('pagination viewPageList : ', viewPageList)
 
   // event handler: pageNumber click event //
   const onPageNumberClickHandler = (page: number) => {

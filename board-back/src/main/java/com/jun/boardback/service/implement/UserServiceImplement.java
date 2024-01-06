@@ -67,11 +67,11 @@ public class UserServiceImplement implements UserService {
             UserEntity userEntity = userRepository.findByEmail(email);
             if (userEntity == null) PatchNicknameResponseDto.noExistUser();
 
-            String nickanme = dto.getNickname();
-            boolean existedNickname = userRepository.existsByNickname(email);
+            String nickname = dto.getNickname();
+            boolean existedNickname = userRepository.existsByNickname(nickname);
             if (existedNickname) return PatchNicknameResponseDto.duplicateNickname();
 
-            userEntity.setNickname(nickanme);
+            userEntity.setNickname(nickname);
             userRepository.save(userEntity);
 
         } catch (Exception e) {

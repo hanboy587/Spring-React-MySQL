@@ -2,10 +2,12 @@ import axios from "axios";
 import { SignInRequestDto, SignUpRequestDto } from "./request/auth";
 import { SignInResponseDto, SignUpResponseDto } from "./response/auth";
 import { ResponseDto } from "./response";
-import { GetSignInUserResponseDto } from "./response/user";
+import { GetSignInUserResponseDto, GetUserResponseDto, PatchNicknameResponseDto, PatchProfileImageResponseDto } from "./response/user";
 import { PatchBoardRequestDto, PostBoardRequestDto, PostCommentRequestDto } from "./request/board";
 import { PostBoardResponseDto, GetBoardResponseDto, IncreaseViewCountResponseDto, GetFavoriteListReponseDto, GetCommentListResponseDto, PutFavoriteResponseDto, PostCommentResponseDto, DeleteBoardResponseDto, PatchBoardResponseDto, GetLatestBoardListResponseDto, GetTop3BoardListResponseDto, GetSearchBoardListResponseDto, GetUserBoardListResponseDto } from "./response/board";
 import { GetPopularListResponseDto, GetRealationListResponseDto } from "./response/search";
+import { PatchNicknameRequestDto, PatchProfileImageRequestDto } from "./request/user";
+import { request } from "http";
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -39,6 +41,8 @@ const GET_SEARCH_BOARD_LIST_URL = (searchWord: string, preSearchWord: string | n
 const GET_RELATION_LIST_URL = (searchWord: string) => `${API_DOMAIN}/search/${searchWord}/relation-list`;
 // 내 게시물 불러오기 //
 const GET_USER_BOARD_LIST_URL = (email: string) => `${API_DOMAIN}/board/user-board-list/${email}`
+// 유저 정보 불러오기 //
+const GET_USER_URL = (email: string) => `${API_DOMAIN}/user/${email}`;
 // 좋아요 누르기 동작 //
 const PUT_FAVORITE_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}/favorite`;
 // 댓글 작성 //
@@ -47,6 +51,10 @@ const POST_COMMENT_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/
 const DELETE_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
 // 게시물 수정 //
 const PATCH_BOARD_URL = (boardNumber: number | string) => `${API_DOMAIN}/board/${boardNumber}`;
+// 닉네임 수정 //
+const PATCH_NICKNAME_URL = () => `${API_DOMAIN}/user/nickname`;
+// 프로필 이미지 수정 //
+const PATCH_PROFILE_IMAGE_URL = () => `${API_DOMAIN}/user/profile-image`;
 // 이미지 업로드 //
 const FILE_DOMAIN = `${DOMAIN}/file`
 const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
@@ -347,7 +355,7 @@ export const getRelationListRequest = async (searchWord: string) => {
 }
 
 // 내 게시물 불러오기 //
-export const userBoardListrequest = async (email: string) => {
+export const getUserBoardListrequest = async (email: string) => {
     const result = await axios.get(GET_USER_BOARD_LIST_URL(email))
         .then(res => {
             const responseBody: GetUserBoardListResponseDto = res.data;
@@ -359,5 +367,52 @@ export const userBoardListrequest = async (email: string) => {
             return responseBody;
         })
 
+    return result;
+}
+
+// 유저 정보 불러오기 //
+export const getUserRequest = async (email: string) => {
+    const result = await axios.get(GET_USER_URL(email))
+        .then(res => {
+            const responseBody: GetUserResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+    return result;
+}
+
+// 닉네임 수정 //
+export const patchNicknameRequest = async (requestBody: PatchNicknameRequestDto, accessToken: string) => {
+    const result = await axios.patch(PATCH_NICKNAME_URL(), requestBody, authorization(accessToken))
+        .then(res => {
+            const responseBody: PatchNicknameResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
+    return result;
+}
+
+
+// 프로필 사진 수정 //
+export const patchProfileImageRequest = async (requestBody: PatchProfileImageRequestDto, accessToken: string) => {
+    const result = await axios.patch(PATCH_PROFILE_IMAGE_URL(), requestBody, authorization(accessToken))
+        .then(res => {
+            // console.log('api : ', res);
+            const responseBody: PatchProfileImageResponseDto = res.data;
+            return responseBody;
+        })
+        .catch(err => {
+            if (!err.response) return null;
+            const responseBody: ResponseDto = err.response.data;
+            return responseBody;
+        })
     return result;
 }

@@ -17,6 +17,8 @@ export default function BoardItem({ boardListItem }: Probs) {
     const { favoriteCount, commentCount, viewCount } = boardListItem;
     const { writeDatetime, writerNickname, writerProfileImage } = boardListItem;
 
+    console.log('writer profileImage : ', writerProfileImage);
+
     // function: 네비 함수 //
     const navigator = useNavigate();
 
