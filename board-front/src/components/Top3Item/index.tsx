@@ -8,7 +8,7 @@ import { BOARD_DETAIL_PATH, BOARD_PATH } from 'constant';
 interface Props {
   top3ListItem: BoardListItem
 }
-
+// 커밋
 // component: Top3ListItem 컴포넌트 //
 export default function Top3Item({ top3ListItem }: Props) {
 
